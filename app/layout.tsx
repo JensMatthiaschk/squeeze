@@ -29,14 +29,13 @@ export const metadata: Metadata = {
       rel: 'apple-touch-icon',
       url: '/apple-touch-icon.png',
     },
-    
   },
-  themeColor: '#ffffff',
 };
 
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
+  themeColor: '#ffffff',
   // maximumScale: 1,
   // userScalable: false,
   // Also supported by less commonly used

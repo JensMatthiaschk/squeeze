@@ -10,7 +10,7 @@ export default function Home() {
   const [ocrText, setOcrText] = useState("");
   const [language, setLanguage] = useState("eng");
   const [summaryMax, setSummaryMax] = useState(3);
-  const [uploadedFile, setFile] = useState();
+  const [uploadedFile, setFile]: any = useState(null);
   const [thumbnail, setThumbnail] = useState(false);
   const [loadingThumbnail, setLoadingThumbnail] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
@@ -81,7 +81,7 @@ export default function Home() {
         const image = new Image();
         image.height = 100;
         image.title = file.name;
-        image.src = reader.result.replace('application/octet-stream', 'image/jpeg');
+        image.src = (reader.result as string).replace('application/octet-stream', 'image/jpeg');
         setThumbnail(true);
         setLoadingThumbnail(false);
         setTimeout(() => document.getElementById("preview").appendChild(image), 100);
