@@ -3,7 +3,6 @@ import { Client } from '@octoai/client';
 import { get_encoding } from "tiktoken";
 import chalk from "chalk";
 
-const encoding = get_encoding("cl100k_base");
 
 if (!process.env.OCTOAI_TOKEN) {
     throw new Error('OCTOAI_TOKEN is not defined');
@@ -16,7 +15,9 @@ export const POST = async (req: Request) => {
     const { text, summaryMax } = await req.json();
     const tokenMax: number = parseInt(process.env.OCTOAI_MAXTOKENS);
     const prompt = "Summarize the following text in " + summaryMax + " sentences simple to understand: " + text;
+    const encoding = get_encoding("cl100k_base");
     const tokens = encoding.encode(prompt).length;
+    encoding.free();
     const faktor = Math.ceil(tokens / tokenMax);
     let parts = [];
     let presummary = "";
