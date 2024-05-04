@@ -21,7 +21,7 @@ export default function Home() {
   const [themeDark, setThemeDark] = useState(false);
 
 
-  function reset() {
+  function resetAll() {
     setSummary("");
     setProgress(0);
     setOcrText("");
@@ -33,6 +33,27 @@ export default function Home() {
     setSettingsOpen(false);
     setThumbnail(false);
     setFile(null);
+    let fileInput = document.getElementById("dropzone-file") as HTMLInputElement;
+    if (fileInput !== null) fileInput.value = "";
+    let summarizeMaxInput = document.getElementById("summarizeMax") as HTMLInputElement;
+    if (summarizeMaxInput !== null) summarizeMaxInput.value = "3";
+    let languageSelect = document.getElementById("languageSelect") as HTMLSelectElement;
+    if (languageSelect !== null) languageSelect.value = "eng";
+    const preview = document.getElementById("preview");
+    if (preview !== null) {
+      preview.innerHTML = "";
+    }
+  }
+
+  function resetDropZone() {
+    setFile(null);
+    setThumbnail(false);
+    setHideUpload(false);
+    setSummary("");
+    setProgress(0);
+    setOcrText("");
+    setSummarizing(false);
+    setIsScanning(false);
     let fileInput = document.getElementById("dropzone-file") as HTMLInputElement;
     if (fileInput !== null) fileInput.value = "";
     let summarizeMaxInput = document.getElementById("summarizeMax") as HTMLInputElement;
@@ -105,7 +126,7 @@ export default function Home() {
   function handleDrop(e: any) {
     e.preventDefault();
     e.stopPropagation();
-    reset();
+    resetDropZone();
    if (themeDark) {
       e.target.classList.remove('dark:border-indigo-600')
       e.target.classList.remove('dark:hover:border-indigo-500')
@@ -315,7 +336,7 @@ export default function Home() {
   return (
     <section className={`${themeDark ? 'dark bg-gradient-to-t from-fuchsia-900 from-0% via-indigo-900 via-25% to-stone-900 to-90%' : 'light bg-gradient-to-t from-fuchsia-300 from-0% via-indigo-300 via-25% to-stone-50 to-90%'} flex flex-col justify-center items-center h-svh w-svw text-base relative`} onClick={handleClickOutside}>
 
-      <button className="absolute top-5 right-5 font" onClick={reset}>
+      <button className="absolute top-5 right-5 font" onClick={resetAll}>
         <svg width="1.5em" height="1.5em" viewBox="0 0 21 21" xmlns="http://www.w3.org/2000/svg">
           <g fill="none" fillRule="evenodd" stroke={`${themeDark ? 'lightgray' : 'gray'}`} strokeLinecap="round" strokeLinejoin="round" transform="matrix(0 1 1 0 2.5 2.5)">
             <path d="m3.98652376 1.07807068c-2.38377179 1.38514556-3.98652376 3.96636605-3.98652376 6.92192932 0 4.418278 3.581722 8 8 8s8-3.581722 8-8-3.581722-8-8-8" />
@@ -338,7 +359,7 @@ export default function Home() {
           <option value="spa">Spanish</option>
         </select>
         <p className="w-fit text-sm mt-3">In how many sentences do you want to summarize your text?</p>
-        <input type="number" id="summarizeMax" placeholder="3" onChange={(e) => setSummaryMax(parseInt(e.target.value))}
+        <input type="number" id="summarizeMax" placeholder="3" onChange={(e) => setSummaryMax(parseInt(e.target.value) || 3)}
           className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
 
         <div className="themeControls flex gap-2 mt-2">
