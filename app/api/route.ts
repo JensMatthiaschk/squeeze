@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { Client } from '@octoai/client';
-import { encode } from "gpt-tokenizer";
+import { encodingForModel } from "js-tiktoken";
 import chalk from "chalk";
 
 
@@ -15,7 +15,8 @@ export const POST = async (req: Request) => {
     const { text, summaryMax } = await req.json();
     const tokenMax: number = parseInt(process.env.OCTOAI_MAXTOKENS);
     const prompt = "Summarize the following text in " + summaryMax + " sentences simple to understand: " + text;
-    const tokens = encode(prompt).length;
+    const encoding = encodingForModel("gpt-4-turbo-preview");
+    const tokens = encoding.encode(prompt).length;
     const faktor = Math.ceil(tokens / tokenMax);
     let parts = [];
     let presummary = "";
@@ -30,7 +31,7 @@ export const POST = async (req: Request) => {
     console.log(chalk.yellow("Summarizing text, parts: "), parts.length);
     for (let i = 0; i < parts.length - 1; i++) {
 
-        let tokenlength = encode(parts[i]).length;
+        let tokenlength = encoding.encode(parts[i]).length;
         console.log(chalk.yellow("Part: " + i + " Tokenlength: " + tokenlength + " Textlength: " + parts[i].length));
 
         const completion = await client.chat.completions.create({
@@ -49,7 +50,7 @@ export const POST = async (req: Request) => {
 
     try {
 
-        let tokenlength = encode(parts[parts.length - 1]).length;
+        let tokenlength = encoding.encode(parts[parts.length - 1]).length;
         console.log(chalk.yellow("Part: " + (parts.length - 1) + " Tokenlength: " + tokenlength + " Textlength: " + parts[parts.length - 1].length));
 
         const completion = await client.chat.completions.create({
@@ -62,7 +63,7 @@ export const POST = async (req: Request) => {
                 },
             ],
         });
-        console.log({ summaryMax, tokenMax, tokens, faktor, presummary }, "Summarize the following text into " + summaryMax + " sentences simple to understand: " + presummary.length + " " + parts[parts.length - 1].length);
+        console.log({ summaryMax, tokenMax, tokens, faktor }, 'presummary:' + presummary.length, "Summarize the following text into " + summaryMax + " sentences simple to understand: " + presummary.length + " " + parts[parts.length - 1].length);
 
         return NextResponse.json({
             success: true,
