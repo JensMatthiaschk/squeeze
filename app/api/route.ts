@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { Client } from '@octoai/client';
-import { get_encoding } from "tiktoken";
+import { encode } from "gpt-tokenizer";
 import chalk from "chalk";
 
 
@@ -15,9 +15,7 @@ export const POST = async (req: Request) => {
     const { text, summaryMax } = await req.json();
     const tokenMax: number = parseInt(process.env.OCTOAI_MAXTOKENS);
     const prompt = "Summarize the following text in " + summaryMax + " sentences simple to understand: " + text;
-    const encoding = get_encoding("cl100k_base");
-    const tokens = encoding.encode(prompt).length;
-    encoding.free();
+    const tokens = encode(prompt).length;
     const faktor = Math.ceil(tokens / tokenMax);
     let parts = [];
     let presummary = "";
@@ -32,7 +30,7 @@ export const POST = async (req: Request) => {
     console.log(chalk.yellow("Summarizing text, parts: "), parts.length);
     for (let i = 0; i < parts.length - 1; i++) {
 
-        let tokenlength = encoding.encode(parts[i]).length;
+        let tokenlength = encode(parts[i]).length;
         console.log(chalk.yellow("Part: " + i + " Tokenlength: " + tokenlength + " Textlength: " + parts[i].length));
 
         const completion = await client.chat.completions.create({
@@ -51,7 +49,7 @@ export const POST = async (req: Request) => {
 
     try {
 
-        let tokenlength = encoding.encode(parts[parts.length - 1]).length;
+        let tokenlength = encode(parts[parts.length - 1]).length;
         console.log(chalk.yellow("Part: " + (parts.length - 1) + " Tokenlength: " + tokenlength + " Textlength: " + parts[parts.length - 1].length));
 
         const completion = await client.chat.completions.create({
