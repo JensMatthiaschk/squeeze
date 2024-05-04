@@ -17,17 +17,103 @@
 }
 
 body {
+  max-width: 100vw;
   color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
+  background: linear-gradient(to bottom,
       transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+      rgb(var(--background-end-rgb))) rgb(var(--background-start-rgb));
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+}
+
+
+.bubble {
+  --r: 25px;
+  /* the radius */
+  --t: 30px;
+  /* the size of the tail */
+
+  max-width: 80%;
+  padding: calc(2*var(--r)/3);
+  -webkit-mask:
+    radial-gradient(var(--t) at var(--_d) 0, #0000 98%, #000 102%) var(--_d) 100%/calc(100% - var(--r)) var(--t) no-repeat,
+    conic-gradient(at var(--r) var(--r), #000 75%, #0000 0) calc(var(--r)/-2) calc(var(--r)/-2) padding-box,
+    radial-gradient(50% 50%, #000 98%, #0000 101%) 0 0/var(--r) var(--r) space padding-box;
+  /* background: linear-gradient(135deg, #d946ef, #4f46e5) border-box; */
+  color: #fff;
+}
+
+.left {
+  --_d: 0%;
+  border-left: var(--t) solid #0000;
+  margin-right: var(--t);
+  place-self: start;
+}
+
+.dark .left {
+  background: linear-gradient(135deg, #0d9488, #0c4a6e) border-box;
+}
+
+.light .left {
+  background: linear-gradient(135deg, #5eead4, #7dd3fc) border-box;
+}
+
+.right {
+  --_d: 100%;
+  border-right: var(--t) solid #0000;
+  margin-left: var(--t);
+  place-self: end;
+}
+
+.dark .right {
+  background: linear-gradient(135deg, #d946ef, #831843) border-box;
+}
+
+.light .right {
+  background: linear-gradient(135deg, #f0abfc, #f9a8d4) border-box;
+}
+
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: grid;
+  place-content: center;
+  gap: 20px;
+  font-family: system-ui, sans-serif;
+  font-size: 20px;
+}
+
+.spinner_qM83 {
+  animation: spinner_8HQG 1.05s infinite;
+}
+
+.spinner_oXPr {
+  animation-delay: .1s;
+}
+
+.spinner_ZTLf {
+  animation-delay: .2s
+}
+
+@keyframes spinner_8HQG {
+
+  /* 0%  */
+  57.14% {
+    animation-timing-function: cubic-bezier(0.33, .66, .66, 1);
+    transform: translate(0)
+  }
+
+  28.57% {
+    animation-timing-function: cubic-bezier(0.33, 0, .66, .33);
+    transform: translateY(-6px)
+  }
+
+  100% {
+    transform: translate(0)
   }
 }
