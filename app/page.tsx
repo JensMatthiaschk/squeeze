@@ -311,9 +311,15 @@ export default function Home() {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "Accept": "application/json",
       },
       body: JSON.stringify({ text, summaryMax }),
     }).then((response) => response.json()).then((data) => {
+      if (!data.success) {
+        alert("Summarization failed. Please try again.");
+        setSummarizing(false);
+        return;
+      }
       setSummary(data.summary);
       setSummarizing(false);
     });

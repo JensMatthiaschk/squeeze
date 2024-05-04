@@ -60,6 +60,8 @@ export const POST = async (req: Request) => {
             return NextResponse.json({
                 success: true,
                 summary: completion.choices[0].message.content
+            }, {
+                status: 200
             });
         } catch (e) {
             console.error(e);
@@ -84,6 +86,8 @@ export const POST = async (req: Request) => {
             return NextResponse.json({
                 success: true,
                 summary: completion.choices[0].message.content
+            }, {
+                status: 200
             });
         } catch (e) {
             console.error(e);
