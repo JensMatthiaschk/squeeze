@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { Client } from '@octoai/client';
 import { encodingForModel } from "js-tiktoken";
-import chalk from "chalk";
+
 
 
 if (!process.env.OCTOAI_TOKEN) {
@@ -12,6 +12,7 @@ if (!process.env.OCTOAI_TOKEN) {
 const client = new Client(process.env.OCTOAI_TOKEN);
 
 export const POST = async (req: Request) => {
+
     const { text, summaryMax } = await req.json();
     const tokenMax: number = parseInt(process.env.OCTOAI_MAXTOKENS);
     const prompt = "Summarize the following text in " + summaryMax + " sentences simple to understand: " + text;
