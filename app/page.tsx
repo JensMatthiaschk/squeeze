@@ -19,6 +19,8 @@ export default function Home() {
   const [summarizing, setSummarizing] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [themeDark, setThemeDark] = useState(false);
+  const [model, setModel] = useState("nous-hermes-2-mixtral-8x7b-dpo");
+  //'"llama-2-13b-chat" | "llama-2-70b-chat" | "codellama-7b-instruct" | "codellama-13b-instruct" | "codellama-34b-instruct" | "codellama-70b-instruct" | "mistral-7b-instruct" | "mixtral-8x7b-instruct" | "nous-hermes-2-mixtral-8x7b-dpo" | "nous-hermes-2-mistral-7b-dpo"'
 
 
   function resetAll() {
@@ -313,7 +315,7 @@ export default function Home() {
         "Content-Type": "application/json",
         "Accept": "application/json",
       },
-      body: JSON.stringify({ text, summaryMax }),
+      body: JSON.stringify({ text, summaryMax, model}),
     }).then((response) => response.json()).then((data) => {
       if (!data.success) {
         alert("Summarization failed. Please try again.");
