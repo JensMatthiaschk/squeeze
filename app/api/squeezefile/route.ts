@@ -17,8 +17,10 @@ export const runtime = 'edge';
 export const POST = async (req: NextRequest): Promise<Response> => {
 
     if (req.method !== 'POST') {
-        return new Response('Method Not Allowed', {
-            status: 405
+        return Response.json({
+            error: 'Method not allowed',
+        }, {
+            status: 405,
         });
     }
 
@@ -50,16 +52,15 @@ export const POST = async (req: NextRequest): Promise<Response> => {
 
             const summary = await getSummary(presummary + ' ' + parts[parts.length - 1], summaryMax);
 
-            return new Response(JSON.stringify({
+            return Response.json({
                 success: true,
                 summary: summary
-            }), {
-                status: 200
             });
         } catch (e) {
             console.error("Error: ",e);
-            return new Response(`Error: ${e}`, {
-                status: 500
+            return Response.json({
+                success: false,
+                error: e
             });
         }
     } else {
@@ -67,18 +68,17 @@ export const POST = async (req: NextRequest): Promise<Response> => {
         try {
             const summary = await getSummary(text, summaryMax);
 
-            return new Response(JSON.stringify({
+            return Response.json({
                 success: true,
                 summary: summary
-            }), {
-                status: 200
             });
 
 
         } catch (e) {
             console.error("Error: ", e);
-            return new Response(`Error: ${e}`, {
-                status: 500
+            return Response.json({
+                success: false,
+                error: e
             });
         }
     }
