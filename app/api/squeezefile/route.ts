@@ -1,20 +1,16 @@
 
-import { NextRequest } from 'next/server';
 import { encodingForModel } from "js-tiktoken";
 import { getChunkSummary, getSummary } from '@/app/utils/octoai';
-
-
 
 
 if (!process.env.OCTOAI_TOKEN) {
     throw new Error('OCTOAI_TOKEN is not defined');
 }
 
-//export const dynamic = 'force-dynamic';
 export const runtime = 'edge';
 
 
-export const POST = async (req: NextRequest): Promise<Response> => {
+export const POST = async (req: Request): Promise<Response> => {
 
     if (req.method !== 'POST') {
         return Response.json({
@@ -48,8 +44,6 @@ export const POST = async (req: NextRequest): Promise<Response> => {
             }
         }
 
-        try {
-
             const summary = await getSummary(presummary + ' ' + parts[parts.length - 1], model, summaryMax);
 
             if (summary) {
@@ -64,16 +58,8 @@ export const POST = async (req: NextRequest): Promise<Response> => {
                 });
             }
 
-        } catch (e) {
-            console.error("Error: ",e);
-            return Response.json({
-                success: false,
-                error: e
-            });
-        }
     } else {
 
-        try {
             const summary = await getSummary(text, model, summaryMax);
 
             if (summary) {
@@ -88,13 +74,5 @@ export const POST = async (req: NextRequest): Promise<Response> => {
                 });
             }
 
-
-        } catch (e) {
-            console.error("Error: ", e);
-            return Response.json({
-                success: false,
-                error: e
-            });
-        }
     }
 }
