@@ -5,6 +5,14 @@ const nextConfig = {
             asyncWebAssembly: true,
             layers: true,
         };
+        config.resolve = {
+            ...config.resolve,
+            fallback: {
+                ...config.resolve.fallback,
+                fs: false,
+                path: false,
+        }
+        };
 
         return config;
     },

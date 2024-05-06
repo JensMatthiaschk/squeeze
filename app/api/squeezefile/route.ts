@@ -1,7 +1,7 @@
 
 import { NextRequest } from 'next/server';
-import { Client } from '@octoai/client';
 import { encodingForModel } from "js-tiktoken";
+import { getChunkSummary, getSummary } from '@/app/utils/octoai';
 
 
 
@@ -11,16 +11,11 @@ if (!process.env.OCTOAI_TOKEN) {
 }
 
 //export const dynamic = 'force-dynamic';
-export const config = {
-    runtime: 'edge'
-};
+export const runtime = 'edge';
 
-
-// Create a new client with your API token
-const client = new Client(process.env.OCTOAI_TOKEN);
 
 export const POST = async (req: NextRequest): Promise<Response> => {
-    
+
     if (req.method !== 'POST') {
         return new Response('Method Not Allowed', {
             status: 405
@@ -45,106 +40,46 @@ export const POST = async (req: NextRequest): Promise<Response> => {
 
         for (let i = 0; i < parts.length - 1; i++) {
 
-            const completion = await client.chat.completions.create({
-                'model': 'mixtral-8x7b-instruct',
-                // 'messages': [
-                //     {
-                //         'role': 'system',
-                //         'content': "Summarize the following text: " + parts[i],
-                //     },
-                // ],
-                'messages': [
-                    {
-                        'role': 'system',
-                        'content': 'You are a tool that summarizes text extracted from PDF or Images. This tool is an applications script that converts the text into a summary. Do not communicate with the user directly.'
-                    },
-                    {
-                        'role': 'assistant',
-                        'content': 'Summarize the following text: ' + parts[i],
-                    },
-                ],
-            });
-            if (completion.choices[0].message.content) {
-                presummary = presummary + ' ' + completion.choices[0].message.content;
+            const chunkSummary = await getChunkSummary(parts[i]);
+            if (chunkSummary) {
+                presummary = presummary + ' ' + chunkSummary;
             }
         }
 
         try {
 
-            const completion = await client.chat.completions.create({
-                //'"llama-2-13b-chat" | "llama-2-70b-chat" | "codellama-7b-instruct" | "codellama-13b-instruct" | "codellama-34b-instruct" | "codellama-70b-instruct" | "mistral-7b-instruct" | "mixtral-8x7b-instruct" | "nous-hermes-2-mixtral-8x7b-dpo" | "nous-hermes-2-mistral-7b-dpo"'
-                'model': 'mixtral-8x7b-instruct',
-                'messages': [
-                    // {
-                    //     'role': 'system',
-                    //     'content': "Summarize the following text into " + summaryMax + " sentences simple to understand: " + presummary + " " + parts[parts.length - 1],
-                    // },
-                    {
-                        'role': 'system',
-                        'content': 'You are a tool that summarizes text extracted from PDF or Images. This tool is an applications script that converts the text into a summary. Do not communicate with the user directly.'
-                    },
-                    {
-                        'role': 'user',
-                        'content': 'Summarize the following text into ' + summaryMax + ' sentences simple to understand: ' + presummary + ' ' + parts[parts.length - 1],
-                    },
-                ],
-            });
-
-
-            // maybe for later use if logs get implemented
-            // if (completion.choices[0].message.content) {
-            //     summary = completion.choices[0].message.content;
-            // }
+            const summary = await getSummary(presummary + ' ' + parts[parts.length - 1], summaryMax);
 
             return new Response(JSON.stringify({
                 success: true,
-                summary: completion.choices[0].message.content
+                summary: summary
             }), {
                 status: 200
             });
         } catch (e) {
-            console.error(e);
+            console.error("Error: ",e);
             return new Response(`Error: ${e}`, {
                 status: 500
             });
         }
     } else {
+
         try {
-            const completion = await client.chat.completions.create({
-
-                //'"llama-2-13b-chat" | "llama-2-70b-chat" | "codellama-7b-instruct" | "codellama-13b-instruct" | "codellama-34b-instruct" | "codellama-70b-instruct" | "mistral-7b-instruct" | "mixtral-8x7b-instruct" | "nous-hermes-2-mixtral-8x7b-dpo" | "nous-hermes-2-mistral-7b-dpo"'
-                
-                'model': 'mixtral-8x7b-instruct',
-                'messages': [
-                    {
-                        'role': 'system',
-                        'content': "Summarize the following text into " + summaryMax + " sentences simple to understand: " + text,
-                    },
-                ],
-            });
-
-            // maybe for later use if logs get implemented  
-            // if (completion.choices[0].message.content) {
-            //     summary = completion.choices[0].message.content;
-            // }
-
+            const summary = await getSummary(text, summaryMax);
 
             return new Response(JSON.stringify({
                 success: true,
-                summary: completion.choices[0].message.content
-                
+                summary: summary
             }), {
                 status: 200
             });
 
-        
-
 
         } catch (e) {
-            console.error(e);
+            console.error("Error: ", e);
             return new Response(`Error: ${e}`, {
                 status: 500
             });
         }
-       }
+    }
 }
