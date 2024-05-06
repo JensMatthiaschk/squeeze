@@ -5,6 +5,9 @@
 <!-- summarize text via octoai tutorial -->
 https://www.youtube.com/watch?v=OIYevBOSMxY&t=719s
 
+<!-- Build a GPT-3 AI app with Next.js and Vercel Edge Functions -->
+https://www.youtube.com/watch?v=9Q9_CQxFUKY
+
 <!-- pdf ocr -->
 https://medium.com/@rjaloudi/building-an-ocr-application-with-node-js-pdf-js-and-tesseract-js-c54fbd039173
 

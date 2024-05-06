@@ -34,6 +34,7 @@ export const getChunkSummary = async (chunk: String) => {
         });
 
         if (completion.choices[0].message.content) {
+            console.log("Chunk Summary: ", completion.choices[0].message.content);
             return completion.choices[0].message.content;
         }
 
@@ -51,18 +52,18 @@ export const getSummary = async (text: String, summaryMax: number) => {
             //'"llama-2-13b-chat" | "llama-2-70b-chat" | "codellama-7b-instruct" | "codellama-13b-instruct" | "codellama-34b-instruct" | "codellama-70b-instruct" | "mistral-7b-instruct" | "mixtral-8x7b-instruct" | "nous-hermes-2-mixtral-8x7b-dpo" | "nous-hermes-2-mistral-7b-dpo"'
             'model': 'mixtral-8x7b-instruct',
             'messages': [
-                // {
-                //     'role': 'system',
-                //     'content': "Summarize the following text into " + summaryMax + " sentences simple to understand: " + presummary + " " + parts[parts.length - 1],
-                // },
                 {
                     'role': 'system',
-                    'content': 'You are a tool that summarizes text extracted from PDF or Images. This tool is an applications script that converts the text into a summary. Do not communicate with the user directly.'
+                    'content': "Summarize the following text into " + summaryMax + " sentences simple to understand: " + text,
                 },
-                {
-                    'role': 'user',
-                    'content': 'Summarize the following text into ' + summaryMax + ' sentences simple to understand: ' + text,
-                },
+                // {
+                //     'role': 'system',
+                //     'content': 'You are a tool that summarizes text extracted from PDF or Images. This tool is an applications script that converts the text into a summary. Do not communicate with the user directly.'
+                // },
+                // {
+                //     'role': 'user',
+                //     'content': 'Summarize the following text into ' + summaryMax + ' sentences simple to understand: ' + text,
+                // },
             ],
         });
 
