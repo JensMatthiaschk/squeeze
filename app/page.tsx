@@ -309,7 +309,7 @@ export default function Home() {
   function summarizeText(text: string) {
 
     setSummarizing(true);
-    fetch(`/api/squeezefile`, {
+    fetch(`/squeezefile`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

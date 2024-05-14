@@ -9,6 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@aws-sdk/client-sso-oidc": "^3.575.0",
+    "@netlify/edge-functions": "^2.7.0",
     "@netlify/plugin-nextjs": "^5.2.1",
     "@octoai/client": "^0.5.2",
     "js-tiktoken": "^1.0.11",
