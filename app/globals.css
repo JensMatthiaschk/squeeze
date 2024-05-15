@@ -118,3 +118,15 @@ body {
     transform: translate(0)
   }
 }
+
+.scroll-container {
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  padding: 30px 0;
+}
+
+.scroll-container::-webkit-scrollbar {
+  display: none;
+  /* Safari and Chrome */
+}

@@ -1,5 +1,7 @@
-import { Client } from 'npm:@octoai/client';
-import { encodingForModel } from 'npm:js-tiktoken';
+// import { Client } from 'npm:@octoai/client';
+// import { encodingForModel } from 'npm:js-tiktoken';
+import { Client } from 'https://esm.sh/@octoai/client';
+import { encodingForModel } from 'https://esm.sh/js-tiktoken';
 
 
 if (!Netlify.env.get("OCTOAI_TOKEN")) {
@@ -10,7 +12,6 @@ const client = new Client(Netlify.env.get("OCTOAI_TOKEN"));
 
 
 export default async function (req, context) {
-
 
 
     if (req.method !== 'POST') {

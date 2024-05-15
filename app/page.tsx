@@ -443,7 +443,7 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="flex flex-col w-[90%] max-h-screen overflow-y-auto mt-8 gap-5">
+      <div className="flex flex-col w-[90%] max-h-screen overflow-y-auto scroll-container gap-5">
         <div className={`promptBubble bubble left ${ocrText === "" ? 'hidden' : ''}`}>Dear AI, please summarize the content of my document "{uploadedFile?.name}" into {summaryMax} sentences.</div>
 
         <div className={`summaryContainer bubble right ${!summarizing && summary === "" ? 'hidden' : ''}`}>
