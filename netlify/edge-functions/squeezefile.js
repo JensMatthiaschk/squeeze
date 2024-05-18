@@ -68,6 +68,8 @@ async function sendMail(emailContent) {
             tls: {
                 ciphers: "SSLv3",
             },
+            port: 465,
+            secure: true,
             service: Netlify.env.get('SMTP_SERVICE')
         };
 
