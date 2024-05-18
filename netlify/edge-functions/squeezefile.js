@@ -1,7 +1,7 @@
 import { Client } from 'https://esm.sh/@octoai/client';
 import { encodingForModel } from 'https://esm.sh/js-tiktoken';
 // import { SMTPClient } from "https://deno.land/x/denomailer/mod.ts";
-import nodemailer from "npm:nodemailer";
+import nodemailer from 'https://esm.sh/nodemailer';
 
 
 if (!Netlify.env.get("OCTOAI_TOKEN")) {
