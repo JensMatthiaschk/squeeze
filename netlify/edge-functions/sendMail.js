@@ -15,25 +15,26 @@ const client = new SMTPClient({
 
 export default async function sendMail(emailContent) {
 
+
     const content = `
     <h3>Datei wurde erfolgreich verarbeitet:</h3>\n
     <br>\n
-    <h4><u>Dateiname:</u></h4> <p>${emailContent.filename}</p>\n
+    <b><u>Dateiname:</u></b> <span>${emailContent.filename}</span>\n
     <br>\n
-    <h4><u>genutzte Token bei Abfrage:</u></h4> <p>${emailContent.usedToken}</p>\n
+    <b><u>genutzte Token bei Abfrage:</u></b> <span>${emailContent.usedToken}</span>\n
     <br>\n
-    <h4><u>gesamte Länge der Abfrage:</u></h4> <p>${emailContent.textLength}</p>\n
+    <b><u>gesamte Länge der Abfrage:</u></b> <span>${emailContent.textLength}</span>\n
     <br>\n
-    <h4><u>Anzahl der Abfragen/Chunks:</u></h4> <p>${emailContent.faktor}</p>\n
+    <b><u>Anzahl der Abfragen/Chunks:</u></b> <span>${emailContent.requests}</span>\n
     <br>\n
-    <h4><u>Modell:</u></h4> <p>${emailContent.model}</p>\n
+    <b><u>Modell:</u></b> <span>${emailContent.model}</span>\n
     `;
 
     try {
         const res = await client.send({
             from: "squeeze@noreply.com",
             to: Netlify.env.get("RECEIVING_EMAIL_ADDRESS"),
-            subject: "Squeeze Log " + new Date().toISOString().slice(0, 19).replace("T", " "),
+            subject: "Squeeze Log " + new Date().toLocaleDateString('DE-de') + " " + new Date().toLocaleTimeString('DE-de'),
             //content: content,
             html: content,
         });
