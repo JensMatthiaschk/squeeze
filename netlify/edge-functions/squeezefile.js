@@ -28,22 +28,22 @@ async function sendMail(emailContent) {
     const content = `
     <h3>Datei wurde erfolgreich verarbeitet:</h3>\n
     <br>\n
-    <h4><u>Dateiname:</u></h4> <p>${emailContent.filename}</p>\n
+    <b>Dateiname:</b> <span>${emailContent.filename}</span>\n
     <br>\n
-    <h4><u>genutzte Token bei Abfrage:</u></h4> <p>${emailContent.usedToken}</p>\n
+    <b>genutzte Token bei Abfrage:</b> <span>${emailContent.usedToken}</span>\n
     <br>\n
-    <h4><u>gesamte Länge der Abfrage:</u></h4> <p>${emailContent.textLength}</p>\n
+    <b>gesamte Länge der Abfrage:</b> <span>${emailContent.textLength}</span>\n
     <br>\n
-    <h4><u>Anzahl der Abfragen/Chunks:</u></h4> <p>${emailContent.requests}</p>\n
+    <b>Anzahl der Abfragen/Chunks:</b> <span>${emailContent.requests}</span>\n
     <br>\n
-    <h4><u>Modell:</u></h4> <p>${emailContent.model}</p>\n
+    <b>Modell:</b> <span>${emailContent.model}</span>\n
     `;
 
     try {
         const res = await emailClient.send({
             from: "squeeze@noreply.com",
             to: Netlify.env.get("RECEIVING_EMAIL_ADDRESS"),
-            subject: "Squeeze Log " + new Date().toISOString().slice(0, 19).replace("T", " "),
+            subject: "Squeeze Log - " + new Date().toLocaleDateString('de-DE') + " " + new Date().toLocaleTimeString('de-DE'),
             //content: content,
             html: content,
         });
