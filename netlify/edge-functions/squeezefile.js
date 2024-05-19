@@ -2,7 +2,7 @@ import { Client } from 'https://esm.sh/@octoai/client';
 import { encodingForModel } from 'https://esm.sh/js-tiktoken';
 // import { SMTPClient } from "https://deno.land/x/denomailer/mod.ts";
 import nodemailer from 'https://esm.sh/nodemailer';
-import { google } from 'npm:googleapis';
+import { google } from 'https://esm.sh/googleapis';
 const OAuth2 = google.auth.OAuth2;
 
 
