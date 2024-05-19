@@ -14,6 +14,7 @@ const client = new Client(Netlify.env.get("OCTOAI_TOKEN"));
 
 
 async function sendMail(emailContent) {
+    console.log("Sending email");
 
     // const emailClient = new SMTPClient({
     //     connection: {
