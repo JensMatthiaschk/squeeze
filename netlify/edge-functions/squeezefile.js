@@ -39,7 +39,15 @@ async function sendMail(emailContent) {
         refresh_token: Netlify.env.get('OAUTH_REFRESH_TOKEN')
     });
     
-    const accessToken = oauth2Client.getAccessToken()
+    // const accessToken = oauth2Client.getAccessToken()
+    const accessToken = await new Promise((resolve, reject) => {
+        oauth2Client.getAccessToken((err, token) => {
+            if (err) {
+                reject("Failed to create access token :(");
+            }
+            resolve(token);
+        });
+    });
     console.log("accesstoken", accessToken);
     
     
