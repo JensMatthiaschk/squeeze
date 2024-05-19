@@ -14,7 +14,7 @@ const client = new Client(Netlify.env.get("OCTOAI_TOKEN"));
 
 
 async function sendMail(emailContent) {
-    console.log("Sending email");
+    console.log("Sending email", Netlify.env.get('SMTP_SERVICE'), Netlify.env.get('SMTP_USER'), Netlify.env.get('RECEIVING_EMAIL_ADDRESS'), Netlify.env.get('OAUTH_CLIENT_ID'), Netlify.env.get('OAUTH_CLIENT_SECRET'), Netlify.env.get('OAUTH_REFRESH_TOKEN'));
 
     // const emailClient = new SMTPClient({
     //     connection: {
@@ -54,6 +54,7 @@ async function sendMail(emailContent) {
             refreshToken: Netlify.env.get('OAUTH_REFRESH_TOKEN'),
             //pass: Netlify.env.get("SMTP_PASS"),
         },
+        debug: true,
         // tls: {
         //     ciphers: "SSLv3",
         // },
