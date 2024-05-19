@@ -14,7 +14,7 @@ const client = new Client(Netlify.env.get("OCTOAI_TOKEN"));
 
 
 async function sendMail(emailContent) {
-    console.log("Sending email", Netlify.env.get('SMTP_SERVICE'), Netlify.env.get('SMTP_USER'), Netlify.env.get('RECEIVING_EMAIL_ADDRESS'), Netlify.env.get('OAUTH_CLIENT_ID'), Netlify.env.get('OAUTH_CLIENT_SECRET'), Netlify.env.get('OAUTH_REFRESH_TOKEN'));
+    console.log("Sending email");
 
     // const emailClient = new SMTPClient({
     //     connection: {
@@ -40,6 +40,7 @@ async function sendMail(emailContent) {
     });
     
     const accessToken = oauth2Client.getAccessToken()
+    console.log("accesstoken", accessToken);
     
     
     const smtpTransportOptions = {
@@ -87,6 +88,7 @@ async function sendMail(emailContent) {
 
 
     try {
+        console.log("transporter.sendMail");
         const info = await transporter.sendMail(mailOptions);
         console.log("Message sent: %s", info.response);
 
