@@ -86,6 +86,7 @@ async function sendMail(emailContent) {
 
     try {
         const info = await transporter.sendMail(mailOptions);
+        console.log("Message sent: %s", info.response);
 
         if (info.response.includes("250")) {
             return res.status(200).send({ message: "Email sent" });
