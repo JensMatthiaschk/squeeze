@@ -63,7 +63,6 @@ async function sendMail(emailContent) {
             refreshToken: Netlify.env.get('OAUTH_REFRESH_TOKEN'),
             //pass: Netlify.env.get("SMTP_PASS"),
         },
-        debug: true,
         // tls: {
         //     ciphers: "SSLv3",
         // },
@@ -71,7 +70,9 @@ async function sendMail(emailContent) {
         // secure: true,
     };
     
-    const transporter = nodemailer.createTransport(smtpTransportOptions);
+    console.log("smtpTransportOptions", smtpTransportOptions);
+
+    const transporter = await nodemailer.createTransport(smtpTransportOptions);
 
     const content = `
     <h3>Datei wurde erfolgreich verarbeitet:</h3>\n
@@ -97,7 +98,13 @@ async function sendMail(emailContent) {
 
     try {
         console.log("transporter.sendMail");
-        const info = await transporter.sendMail(mailOptions);
+        const info = await transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                console.log("Error occurred. " + error.message);
+                return error;
+            }
+            return info;
+        });
         console.log("Message sent: %s", info.response);
 
         if (info.response.includes("250")) {
