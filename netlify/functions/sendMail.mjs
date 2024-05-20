@@ -5,6 +5,7 @@ const OAuth2 = google.auth.OAuth2;
 
 
 export default async function sendMail(emailContent) {
+    console.log("sendmail...");
 
     // const emailClient = new SMTPClient({
     //     connection: {
@@ -89,7 +90,7 @@ export default async function sendMail(emailContent) {
 
 
     try {
-
+        console.log("try Sending email...")
         const info = await new Promise((resolve, reject) => {
             transporter.sendMail(mailOptions, (err, info) => {
                 if (err) {
