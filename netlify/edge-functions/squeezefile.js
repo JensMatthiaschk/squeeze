@@ -55,10 +55,11 @@ async function sendMail(emailContent) {
         secure: true,
         service: Netlify.env.get('SMTP_SERVICE'),
         auth: {
-            type: "OAuth2",
-            clientId: Netlify.env.get('OAUTH_CLIENT_ID'),
-            clientSecret: Netlify.env.get('OAUTH_CLIENT_SECRET'),
-            //pass: Netlify.env.get("SMTP_PASS"),
+            // type: "OAuth2",
+            // clientId: Netlify.env.get('OAUTH_CLIENT_ID'),
+            // clientSecret: Netlify.env.get('OAUTH_CLIENT_SECRET'),
+            user: Netlify.env.get("SMTP_USER"),
+            pass: Netlify.env.get("SMTP_PASS"),
         },
         // tls: {
         //     ciphers: "SSLv3",
@@ -87,11 +88,11 @@ async function sendMail(emailContent) {
         to: Netlify.env.get('RECEIVING_EMAIL_ADDRESS'),
         subject: "Squeeze Log - " + new Date().toLocaleDateString('de-DE') + " " + new Date().toLocaleTimeString('de-DE'),
         html: content,
-        auth: {
-            user: Netlify.env.get("SMTP_USER"),
-            accessToken: accessToken.toString(),
-            refreshToken: Netlify.env.get('OAUTH_REFRESH_TOKEN'),
-        }
+        // auth: {
+        //     user: Netlify.env.get("SMTP_USER"),
+        //     accessToken: accessToken.toString(),
+        //     refreshToken: Netlify.env.get('OAUTH_REFRESH_TOKEN'),
+        // }
     };
 
 
