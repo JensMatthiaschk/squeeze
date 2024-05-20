@@ -4,7 +4,7 @@ import { encodingForModel } from 'https://esm.sh/js-tiktoken';
 // import nodemailer from 'https://esm.sh/nodemailer';
 // import { google } from 'https://esm.sh/googleapis';
 // const OAuth2 = google.auth.OAuth2;
-import sendMail from '../functions/sendMail.mjs';    
+import { SMTPClient } from 'https://esm.sh/emailjs';
 
 
 if (!Netlify.env.get("OCTOAI_TOKEN")) {
@@ -14,127 +14,150 @@ if (!Netlify.env.get("OCTOAI_TOKEN")) {
 const client = new Client(Netlify.env.get("OCTOAI_TOKEN"));
 
 
-// async function sendMail(emailContent) {
+async function sendMail(emailContent) {
 
-//     // const emailClient = new SMTPClient({
-//     //     connection: {
-//     //         hostname: Netlify.env.get("SMTP_HOST"),
-//     //         port: 465,
-//     //         secure: false,
-//     //         tls: true,
-//     //         auth: {
-//     //             username: Netlify.env.get("SMTP_USER"),
-//     //             password: Netlify.env.get("SMTP_PASS")
-//     //         },
-//     //     },
-//     // });
+    // const emailClient = new SMTPClient({
+    //     connection: {
+    //         hostname: Netlify.env.get("SMTP_HOST"),
+    //         port: 465,
+    //         secure: false,
+    //         tls: true,
+    //         auth: {
+    //             username: Netlify.env.get("SMTP_USER"),
+    //             password: Netlify.env.get("SMTP_PASS")
+    //         },
+    //     },
+    // });
     
-//     const oauth2Client = new OAuth2(
-//         Netlify.env.get('OAUTH_CLIENT_ID'),
-//         Netlify.env.get('OAUTH_CLIENT_SECRET'),
-//         'https://developers.google.com/oauthplayground'
-//     );
+    // const oauth2Client = new OAuth2(
+    //     Netlify.env.get('OAUTH_CLIENT_ID'),
+    //     Netlify.env.get('OAUTH_CLIENT_SECRET'),
+    //     'https://developers.google.com/oauthplayground'
+    // );
     
-//     oauth2Client.setCredentials({
-//         refresh_token: Netlify.env.get('OAUTH_REFRESH_TOKEN')
-//     });
+    // oauth2Client.setCredentials({
+    //     refresh_token: Netlify.env.get('OAUTH_REFRESH_TOKEN')
+    // });
     
-//     // const accessToken = oauth2Client.getAccessToken()
-//     const accessToken = await new Promise((resolve, reject) => {
-//         oauth2Client.getAccessToken((err, token) => {
-//             if (err) {
-//                 reject("Failed to create access token :(");
-//             }
-//             resolve(token);
-//         });
-//     });
+    // // const accessToken = oauth2Client.getAccessToken()
+    // const accessToken = await new Promise((resolve, reject) => {
+    //     oauth2Client.getAccessToken((err, token) => {
+    //         if (err) {
+    //             reject("Failed to create access token :(");
+    //         }
+    //         resolve(token);
+    //     });
+    // });
     
     
-//     const smtpTransportOptions = {
-//         host: Netlify.env.get("SMTP_HOST"),
-//         port: 465,
-//         secure: true,
-//         service: Netlify.env.get('SMTP_SERVICE'),
-//         auth: {
-//             type: "OAuth2",
-//             clientId: Netlify.env.get('OAUTH_CLIENT_ID'),
-//             clientSecret: Netlify.env.get('OAUTH_CLIENT_SECRET'),
-//             //user: Netlify.env.get("SMTP_USER"),
-//             //pass: Netlify.env.get("SMTP_PASS"),
-//         },
-//         tls: {
-//             ciphers: "SSLv3",
-//         },
-//     };
+    // const smtpTransportOptions = {
+    //     host: Netlify.env.get("SMTP_HOST"),
+    //     port: 465,
+    //     secure: true,
+    //     service: Netlify.env.get('SMTP_SERVICE'),
+    //     auth: {
+    //         type: "OAuth2",
+    //         clientId: Netlify.env.get('OAUTH_CLIENT_ID'),
+    //         clientSecret: Netlify.env.get('OAUTH_CLIENT_SECRET'),
+    //         //user: Netlify.env.get("SMTP_USER"),
+    //         //pass: Netlify.env.get("SMTP_PASS"),
+    //     },
+    //     tls: {
+    //         ciphers: "SSLv3",
+    //     },
+    // };
     
    
 
-//     const transporter = await nodemailer.createTransport(smtpTransportOptions);
+    // const transporter = await nodemailer.createTransport(smtpTransportOptions);
 
-//     const content = `
-//     <h3>Datei wurde erfolgreich verarbeitet:</h3>\n
-//     <br>\n
-//     <b>Dateiname:</b> <span>${emailContent.filename}</span>\n
-//     <br>\n
-//     <b>genutzte Token bei Abfrage:</b> <span>${emailContent.usedToken}</span>\n
-//     <br>\n
-//     <b>gesamte Länge der Abfrage:</b> <span>${emailContent.textLength}</span>\n
-//     <br>\n
-//     <b>Anzahl der Abfragen/Chunks:</b> <span>${emailContent.requests}</span>\n
-//     <br>\n
-//     <b>Modell:</b> <span>${emailContent.model}</span>\n
-//     `;
+    const content = `
+    <h3>Datei wurde erfolgreich verarbeitet:</h3>\n
+    <br>\n
+    <b>Dateiname:</b> <span>${emailContent.filename}</span>\n
+    <br>\n
+    <b>genutzte Token bei Abfrage:</b> <span>${emailContent.usedToken}</span>\n
+    <br>\n
+    <b>gesamte Länge der Abfrage:</b> <span>${emailContent.textLength}</span>\n
+    <br>\n
+    <b>Anzahl der Abfragen/Chunks:</b> <span>${emailContent.requests}</span>\n
+    <br>\n
+    <b>Modell:</b> <span>${emailContent.model}</span>\n
+    `;
 
-//     const mailOptions = {
-//         from: Netlify.env.get('SMTP_USER'),
-//         to: Netlify.env.get('RECEIVING_EMAIL_ADDRESS'),
-//         subject: "Squeeze Log - " + new Date().toLocaleDateString('de-DE') + " " + new Date().toLocaleTimeString('de-DE'),
-//         html: content,
-//         auth: {
-//             user: Netlify.env.get("SMTP_USER"),
-//             accessToken: accessToken.toString(),
-//             refreshToken: Netlify.env.get('OAUTH_REFRESH_TOKEN'),
-//         }
-//     };
+    // const mailOptions = {
+    //     from: Netlify.env.get('SMTP_USER'),
+    //     to: Netlify.env.get('RECEIVING_EMAIL_ADDRESS'),
+    //     subject: "Squeeze Log - " + new Date().toLocaleDateString('de-DE') + " " + new Date().toLocaleTimeString('de-DE'),
+    //     html: content,
+    //     auth: {
+    //         user: Netlify.env.get("SMTP_USER"),
+    //         accessToken: accessToken.toString(),
+    //         refreshToken: Netlify.env.get('OAUTH_REFRESH_TOKEN'),
+    //     }
+    // };
 
+    const client = new SMTPClient({
+        user: Netlify.env.get('SMTP_USER'),
+        password: Netlify.env.get('SMTP_PASS'),
+        host: Netlify.env.get('SMTP_HOST'),
+        ssl: true,
+    });
 
-//     try {
+    // send the message and get a callback with an error or details of the message that was sent
+    
+    
+    try {
+        client.send(
+            {
+                text: content,
+                from: Netlify.env.get('SMTP_USER'),
+                to: Netlify.env.get('SMTP_USER'),
+                subject: "Squeeze Log - " + new Date().toLocaleDateString('de-DE') + " " + new Date().toLocaleTimeString('de-DE'),
+                attachment: [
+                    { data: content, alternative: true }
+                ]
+            },
+            (err, message) => {
+                console.log(err || message);
+            }
+        );
 
-//         const info = await new Promise((resolve, reject) => {
-//             transporter.sendMail(mailOptions, (err, info) => {
-//                 if (err) {
-//                     console.error(err);
-//                     reject(err);
-//                 } else {
-//                     resolve(info);
-//                 }
-//             });
-//         });
-//         console.log("Message sent: %s", info.response);
+        // const info = await new Promise((resolve, reject) => {
+        //     transporter.sendMail(mailOptions, (err, info) => {
+        //         if (err) {
+        //             console.error(err);
+        //             reject(err);
+        //         } else {
+        //             resolve(info);
+        //         }
+        //     });
+        // });
+        // console.log("Message sent: %s", info.response);
 
-//         if (info.response.includes("250")) {
-//             return res.status(200).send({ message: "Email sent" });
-//         } else {
-//             return res.status(400).send({ message: "Email not sent" });
-//         }
+        if (info.response.includes("250")) {
+            return res.status(200).send({ message: "Email sent" });
+        } else {
+            return res.status(400).send({ message: "Email not sent" });
+        }
 
-//         // const res = await emailClient.send({
-//         //     from: "squeeze@noreply.com",
-//         //     to: Netlify.env.get("RECEIVING_EMAIL_ADDRESS"),
-//         //     subject: "Squeeze Log - " + new Date().toLocaleDateString('de-DE') + " " + new Date().toLocaleTimeString('de-DE'),
-//         //     //content: content,
-//         //     html: content,
-//         // });
+        // const res = await emailClient.send({
+        //     from: "squeeze@noreply.com",
+        //     to: Netlify.env.get("RECEIVING_EMAIL_ADDRESS"),
+        //     subject: "Squeeze Log - " + new Date().toLocaleDateString('de-DE') + " " + new Date().toLocaleTimeString('de-DE'),
+        //     //content: content,
+        //     html: content,
+        // });
 
-//         // await emailClient.close();
+        // await emailClient.close();
 
-//         // if (res.status === 250) {
-//         //     return res.status(200).send({ message: "Email sent" });
-//         // } else {
-//         //     return res.status(400).send({ message: "Email not sent" });
-//         // }
-//     } catch (error) { return error }
-// }
+        // if (res.status === 250) {
+        //     return res.status(200).send({ message: "Email sent" });
+        // } else {
+        //     return res.status(400).send({ message: "Email not sent" });
+        // }
+    } catch (error) { return error }
+}
 
 
 
@@ -203,6 +226,7 @@ export default async function squeezefile (req) {
                     filename: filename,
                     requests: faktor
                 })
+                
                 return Response.json({
                     success: true,
                     summary: completion.choices[0].message.content
@@ -242,6 +266,7 @@ export default async function squeezefile (req) {
                     filename: filename,
                     requests: faktor
                 })
+                
                 return Response.json({
                     success: true,
                     summary: completion.choices[0].message.content
