@@ -98,9 +98,10 @@ async function sendMail(emailContent) {
     try {
         const info = await transporter.sendMail(mailOptions, (error, info) => {
             if (error) {
-                console.log("Error occurred. " + error.message);
+                console.log("Error occurred. ", error);
                 return error;
             }
+            console.log("Message sent: %s", info);
             return info;
         });
         console.log("Message sent: %s", info.response);
