@@ -14,7 +14,6 @@ const client = new Client(Netlify.env.get("OCTOAI_TOKEN"));
 
 
 async function sendMail(emailContent) {
-    console.log("Sending email");
 
     // const emailClient = new SMTPClient({
     //     connection: {
@@ -48,29 +47,24 @@ async function sendMail(emailContent) {
             resolve(token);
         });
     });
-    console.log("accesstoken", accessToken);
     
     
     const smtpTransportOptions = {
-        //host: Netlify.env.get("SMTP_HOST"),
+        host: Netlify.env.get("SMTP_HOST"),
+        port: 465,
+        secure: true,
         service: Netlify.env.get('SMTP_SERVICE'),
         auth: {
             type: "OAuth2",
-            user: Netlify.env.get("SMTP_USER"),
-            accessToken: accessToken.toString(),
             clientId: Netlify.env.get('OAUTH_CLIENT_ID'),
             clientSecret: Netlify.env.get('OAUTH_CLIENT_SECRET'),
-            refreshToken: Netlify.env.get('OAUTH_REFRESH_TOKEN'),
             //pass: Netlify.env.get("SMTP_PASS"),
         },
         // tls: {
         //     ciphers: "SSLv3",
         // },
-        // port: 465,
-        // secure: true,
     };
     
-    console.log("smtpTransportOptions", smtpTransportOptions);
 
     const transporter = await nodemailer.createTransport(smtpTransportOptions);
 
@@ -93,11 +87,15 @@ async function sendMail(emailContent) {
         to: Netlify.env.get('RECEIVING_EMAIL_ADDRESS'),
         subject: "Squeeze Log - " + new Date().toLocaleDateString('de-DE') + " " + new Date().toLocaleTimeString('de-DE'),
         html: content,
+        auth: {
+            user: Netlify.env.get("SMTP_USER"),
+            accessToken: accessToken.toString(),
+            refreshToken: Netlify.env.get('OAUTH_REFRESH_TOKEN'),
+        }
     };
 
 
     try {
-        console.log("transporter.sendMail");
         const info = await transporter.sendMail(mailOptions, (error, info) => {
             if (error) {
                 console.log("Error occurred. " + error.message);
