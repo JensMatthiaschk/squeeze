@@ -372,7 +372,20 @@ export default function Home() {
         <p className="w-fit text-sm mt-3">In how many sentences do you want to summarize your text?</p>
         <input type="number" id="summarizeMax" placeholder="3" onChange={(e) => setSummaryMax(parseInt(e.target.value) || 3)}
           className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
-
+        <p className="w-fit text-sm mt-3">Which model do you want to use for summarization?</p>
+        <select id="modelSelect" onChange={(e) => setModel(e.target.value)} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+          {/* <option value="llama-2-13b-chat">llama-2-13b-chat</option>
+          <option value="llama-2-70b-chat">llama-2-70b-chat</option>
+          <option value="codellama-7b-instruct">codellama-7b-instruct</option>
+          <option value="codellama-13b-instruct">codellama-13b-instruct</option>
+          <option value="codellama-34b-instruct">codellama-34b-instruct</option>
+          <option value="codellama-70b-instruct">codellama-70b-instruct</option> */}
+          <option value="mistral-7b-instruct">mistral-7b-instruct</option>
+          <option value="mixtral-8x7b-instruct">mixtral-8x7b-instruct</option>
+          <option value="nous-hermes-2-mixtral-8x7b-dpo">nous-hermes-2-mixtral-8x7b-dpo</option>
+          <option value="nous-hermes-2-mistral-7b-dpo">nous-hermes-2-mistral-7b-dpo</option>
+          {/* <option value="gpt-3.5-turbo-0125">GPT-3.5 turbo</option> */}
+        </select>
         <div className="themeControls flex gap-2 mt-2">
           <button onClick={() => setThemeDark(false)} className="bg-gray-300 text-gray-900 dark:bg-gray-700 dark:text-white px-3 py-1 rounded-lg">
             <svg xmlns="http://www.w3.org/2000/svg" fill="rgb(209 213 219)" height="1.2em" width="1.2em" version="1.1" id="Capa_1" viewBox="0 0 207.628 207.628" >
