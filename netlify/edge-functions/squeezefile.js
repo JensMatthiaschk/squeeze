@@ -1,5 +1,3 @@
-import { Client } from 'https://esm.sh/@octoai/client';
-import OpenAi from 'https://esm.sh/openai';
 import { encodingForModel } from 'https://esm.sh/js-tiktoken';
 import sgMail from 'https://esm.sh/@sendgrid/mail';
 
@@ -11,7 +9,7 @@ if (!Netlify.env.get("OCTOAI_TOKEN")) {
 
 
 function sendMail(emailContent) {
-    
+
     const content = `
     <h3>Datei wurde erfolgreich verarbeitet:</h3>\n
     <br>\n
@@ -24,11 +22,13 @@ function sendMail(emailContent) {
     <b>Anzahl der Abfragen/Chunks:</b> <span>${emailContent.requests}</span>\n
     <br>\n
     <b>Modell:</b> <span>${emailContent.model}</span>\n
+    <br>\n
+    <b>Summary:</b> <span>${emailContent.summary}</span>\n
     `;
-    
-    
+
+
     try {
-        
+
         sgMail.setApiKey(Netlify.env.get("SENDGRID_API_KEY"));
         const msg = {
             to: Netlify.env.get('RECEIVING_EMAIL_ADDRESS'),
@@ -38,22 +38,22 @@ function sendMail(emailContent) {
             html: content,
         }
         sgMail
-        .send(msg)
-        .then(() => {
-            console.log('Log-Email sent')
-        })
-        .catch((error) => {
-            console.error(error)
-        })
-        
+            .send(msg)
+            .then(() => {
+                console.log('Log-Email sent')
+            })
+            .catch((error) => {
+                console.error(error)
+            })
+
     } catch (error) { return error }
 }
 
 
 
-export default async function squeezefile (req) {
-    
-    
+export default async function squeezefile(req, context) {
+
+
     if (req.method !== 'POST') {
         return Response.json({
             error: 'Method not allowed',
@@ -61,19 +61,22 @@ export default async function squeezefile (req) {
             status: 405,
         });
     }
-    
+
     const { text, summaryMax, model, filename } = await req.json();
-    let client;
+    let api;
+    let bearer;
     let tokenMax;
     if (model.includes("gpt")) {
-        client = new OpenAi({ apiKey: Netlify.env.get("OPENAI_API_KEY") });
+        api = Netlify.env.get("OPENAI_API");
+        bearer = Netlify.env.get("OPENAI_API_KEY");
         if (model.includes("4")) {
             tokenMax = parseInt(Netlify.env.get("OPENAI_MAXTOKENS_GPT4o"));
         } else {
-        tokenMax = parseInt(Netlify.env.get("OPENAI_MAXTOKENS_GPT3_5"));
+            tokenMax = parseInt(Netlify.env.get("OPENAI_MAXTOKENS_GPT3_5"));
         }
     } else {
-        client = new Client(Netlify.env.get("OCTOAI_TOKEN"));
+        api = Netlify.env.get("OCTOAI_API");
+        bearer = Netlify.env.get("OCTOAI_TOKEN")
         tokenMax = parseInt(Netlify.env.get("OCTOAI_MAXTOKENS"));
     }
     const prompt = "Summarize the following text into " + summaryMax + " sentences and simple to understand: " + text;
@@ -82,124 +85,220 @@ export default async function squeezefile (req) {
     const faktor = Math.ceil(tokens / tokenMax);
     let parts = [];
     let presummary = "";
-    
-    
+
+
     if (faktor > 1) {
         try {
             const partLength = Math.ceil(text.length / faktor);
             for (let i = 0; i < faktor; i++) {
                 parts.push(text.slice(i * partLength, (i + 1) * partLength));
             }
-            
-            for (let i = 0; i < parts.length - 1; i++) {
-                
-                const completion = await client.chat.completions.create({
-                    'model': model,
-                    'messages': [
-                        {
-                            'role': 'system',
-                            'content': "Summarize the following text: " + parts[i],
-                        },
-                        // {
-                        //     'role': 'user',
-                        //     'content': "Summarize the following text: " + parts[i],
-                        // }
-                    ],
-                });
 
-                
+            for (let i = 0; i < parts.length - 1; i++) {
+
+
+                const completion = await fetch(api, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + bearer
+                    },
+                    body: JSON.stringify({
+                        model: model,
+                        'messages': [
+                            {
+                                'role': 'system',
+                                'content': "You're an application which summarizes text which got extracted from pdfs or other files. Do not communicate with the user directly."
+                            },
+                            {
+                                'role': 'user',
+                                'content': "Summarize the following text: " + parts[i],
+                            },
+                        ],
+                        "presence_penalty": 0,
+                        "temperature": 0.1,
+                        "top_p": 0.9
+                    })
+                }).then(res => res.json());
+
+
                 if (completion.choices[0].message.content) {
                     presummary = presummary + ' ' + completion.choices[0].message.content
                 }
             }
-            
-            
-            const completion = await client.chat.completions.create({
-                'model': model,
-                'messages': [
-                    {
-                        'role': 'system',
-                        'content': "You're an application which summarizes text which got extracted from pdfs or other files into a certain amount of sentences. Do not communicate with the user directly."
-                    },
-                    {
-                        'role': 'user',
-                        'content': "Summarize the following text into " + summaryMax + " sentences: " + presummary + ' ' + parts[parts.length - 1],
-                    },
-                ],
+
+
+            const resp = await fetch(api, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + bearer
+                },
+                body: JSON.stringify({
+                    model: model,
+                    'messages': [
+                        {
+                            'role': 'system',
+                            'content': "You're an application which summarizes text which got extracted from pdfs or other files into a certain amount of sentences. Do not communicate with the user directly."
+                        },
+                        {
+                            'role': 'user',
+                            'content': "Summarize the following text into " + summaryMax + " sentences: " + presummary + ' ' + parts[parts.length - 1],
+                        },
+                    ],
+                    "presence_penalty": 0,
+                    "temperature": 0.1,
+                    "top_p": 0.9,
+                    stream: true,
+                })
             });
 
-            if (completion.choices[0].message.content) {
-                sendMail({
-                    usedToken: tokens,
-                    textLength: prompt.length,
-                    model: model,
-                    filename: filename,
-                    requests: faktor
-                })
+            let full = "";
+            
+            const body = resp.body
+            .pipeThrough(new TextDecoderStream())
+                .pipeThrough(
+                    new TransformStream({
+                        transform: (chunk, controller) => {
+                            if (chunk.includes('[DONE]')) {
+                                controller.enqueue('[DONE]');
+                            } else if (chunk.startsWith('data:')) {
+                                try {
+                                const payload = JSON.parse(chunk.replace('data: ', '')) || null;
+                                if (payload.choices[0].finish_reason) {
+                                    return;
+                                }
+                                if (payload) {
+                                    const text = payload.choices[0].delta?.content || "";
+                                    if (text) {
+                                            controller.enqueue(text);
+                                            full = full + text;
+                                        }
+                                    }
+                                } catch (e) {
+                                    console.error(e);
+                                }
+                            }
+                            
+                        }
+                    }),
+                )
+                .pipeThrough(new TextEncoderStream({
+                    
+                }));
                 
-                return Response.json({
-                    success: true,
-                    summary: completion.choices[0].message.content
-                });
-            } else {
-                return Response.json({
-                    success: false,
-                    error: "No summary"
-                });
-            }
-        } catch (error) {
-            return Response.json({
-                success: false,
-                error: error
+                sendMail({
+                        usedToken: tokens,
+                        textLength: prompt.length,
+                        model: model,
+                        filename: filename,
+                        requests: faktor,
+                        summary: full
+                    })
+
+            return new Response(body, {
+                status: resp.status,
+                headers: resp.headers,
+            });
+
+
+        } catch (e) {
+            console.error("error occurred:", e);
+            return new Response(JSON.stringify({ error: e.message }), {
+                status: 500, headers: {
+                    'Content-Type': 'application/json',
+                },
             });
         }
 
     } else {
+        
         try {
 
-            const completion = await client.chat.completions.create({
-
-                'model': model,
-                'messages': [
-                    {
-                        'role': 'system',
-                        'content': "You're an application which summarizes text which got extracted from pdfs or other files into a certain amount of sentences. Do not communicate with the user directly."
-                    },
-                    {
-                        'role': 'user',
-                        'content': "Summarize the following text into " + summaryMax + " sentences: " + text,
-                    },
-                ],
+            const resp = await fetch(api, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + bearer
+                },
+                body: JSON.stringify({
+                    model: model,
+                    'messages': [
+                        {
+                            'role': 'system',
+                            'content': "You're an application which summarizes text which got extracted from pdfs or other files into a certain amount of sentences. Do not communicate with the user directly."
+                        },
+                        {
+                            'role': 'user',
+                            'content': "Summarize the following text into " + summaryMax + " sentences: " + text,
+                        },
+                    ],
+                    "presence_penalty": 0,
+                    "temperature": 0.1,
+                    "top_p": 0.9,
+                    stream: true,
+                })
             });
 
-            if (completion.choices[0].message.content) {
-                sendMail({
-                    usedToken: tokens,
-                    textLength: prompt.length,
-                    model: model,
-                    filename: filename,
-                    requests: faktor
-                })
-                
-                return Response.json({
-                    success: true,
-                    summary: completion.choices[0].message.content
-                });
-            } else {
-                return Response.json({
-                    success: false,
-                    error: "No summary"
-                });
-            }
+            let full = "";
 
-        } catch (error) {
-            return Response.json({
-                success: false,
-                error: error
+            const body = resp.body
+                .pipeThrough(new TextDecoderStream())
+                .pipeThrough(
+                    new TransformStream({
+                        transform: (chunk, controller) => {
+                            if (chunk.includes('[DONE]')) {
+                                controller.enqueue('[DONE]');
+                            } else if (chunk.startsWith('data:')) {
+                                try {
+                                    const payload = JSON.parse(chunk.replace('data: ', '')) || null;
+                                    if (payload.choices[0].finish_reason) {
+                                        return;
+                                    }
+                                    if (payload) {
+                                        const text = payload.choices[0].delta?.content || "";
+                                        if (text) {
+                                            controller.enqueue(text);
+                                            full = full + text;
+                                        }
+                                    }
+                                } catch (e) {
+                                    console.error(e);
+                                }
+                            }
+
+                        }
+                    }),
+                )
+                .pipeThrough(new TextEncoderStream({
+
+                }));
+
+            sendMail({
+                usedToken: tokens,
+                textLength: prompt.length,
+                model: model,
+                filename: filename,
+                requests: faktor,
+                summary: full
+            })
+
+            return new Response(body, {
+                status: resp.status,
+                headers: resp.headers,
+            });
+
+
+        } catch (e) {
+            console.error("error occurred:", e);
+            return new Response(JSON.stringify({ error: e.message }), {
+                status: 500, headers: {
+                    'Content-Type': 'application/json',
+                },
             });
         }
     }
-// }
+    // }
 }
 
 export const config = {

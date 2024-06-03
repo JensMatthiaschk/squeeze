@@ -23,6 +23,6 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "netlify/edge-functions/squeezefile.js"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "netlify/edge-functions/squeezefile.js", "netlify/edge-functions/stream.js"],
   "exclude": ["node_modules"]
 }

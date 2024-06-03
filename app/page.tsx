@@ -17,9 +17,10 @@ export default function Home() {
   const [isReading, setIsReading] = useState(false);
   const [hideUpload, setHideUpload] = useState(false);
   const [summarizing, setSummarizing] = useState(false);
+  const [writing, setWriting] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [themeDark, setThemeDark] = useState(false);
-  const [model, setModel] = useState("nous-hermes-2-mixtral-8x7b-dpo");
+  const [model, setModel] = useState("mixtral-8x7b-instruct");
   //'"llama-2-13b-chat" | "llama-2-70b-chat" | "codellama-7b-instruct" | "codellama-13b-instruct" | "codellama-34b-instruct" | "codellama-70b-instruct" | "mistral-7b-instruct" | "mixtral-8x7b-instruct" | "nous-hermes-2-mixtral-8x7b-dpo" | "nous-hermes-2-mistral-7b-dpo"'
 
 
@@ -129,7 +130,7 @@ export default function Home() {
     e.preventDefault();
     e.stopPropagation();
     resetDropZone();
-   if (themeDark) {
+    if (themeDark) {
       e.target.classList.remove('dark:border-indigo-600')
       e.target.classList.remove('dark:hover:border-indigo-500')
       e.target.classList.add('dark:border-gray-600')
@@ -306,28 +307,44 @@ export default function Home() {
     summarizeText(scanText);
   }
 
-  function summarizeText(text: string) {
+  async function summarizeText(text: string) {
     setSummarizing(true);
-    fetch(`/squeezefile`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Accept": "application/json",
-      },
-      body: JSON.stringify({ text, summaryMax, model, filename: uploadedFile?.name }),
-    }).then((response) => response.json()).then((data) => {
-      if (!data.success) {
-        setSummarizing(false);
-        setSummary('🥺...something went wrong, please try again');
-        return;
+
+    try {
+      const response = await fetch(`/squeezefile`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+        },
+        body: JSON.stringify({ text, summaryMax, model, filename: uploadedFile?.name }),
+      })
+
+      const reader = response.body.pipeThrough(new TextDecoderStream()).getReader();
+      let done = false;
+      while (!done) {
+        const { value, done: readerDone } = await reader.read();
+        done = readerDone;
+        if (done) {
+          break;
+        }
+
+        if (value.includes('[DONE]')) {
+          // setWriting(false);
+          break;
+        }
+        if (value) {
+          setSummarizing(false);
+          setWriting(true);
+          setSummary((prev) => prev + value);
+        }
+        // if (value) setSummary((prev) => prev + value);
       }
-      setSummary(data.summary);
-      setSummarizing(false);
-    }).catch((error) => {
+    } catch (error) {
       console.error('Error:', error);
       setSummarizing(false);
       setSummary('🥺...something went wrong, please try again');
-    });
+    }
   }
 
   const settingsContainer = useRef(null);
@@ -345,7 +362,7 @@ export default function Home() {
 
 
   return (
-    <section className={`${themeDark ? 'dark bg-gradient-to-t from-fuchsia-900 from-0% via-indigo-900 via-25% to-stone-900 to-90%' : 'light bg-gradient-to-t from-fuchsia-300 from-0% via-indigo-300 via-25% to-stone-50 to-90%'} flex flex-col justify-center items-center h-svh w-svw text-base relative`} onClick={handleClickOutside}>
+    <div id="main" className={`${themeDark ? 'dark bg-gradient-to-t from-fuchsia-900 from-0% via-indigo-900 via-25% to-stone-900 to-90%' : 'light bg-gradient-to-t from-fuchsia-300 from-0% via-indigo-300 via-25% to-stone-50 to-90%'} flex flex-col justify-center items-center h-full w-full text-base relative overflow-hidden`} onClick={handleClickOutside}>
 
       <button className="absolute top-5 right-5 font" onClick={resetAll}>
         <svg width="1.5em" height="1.5em" viewBox="0 0 21 21" xmlns="http://www.w3.org/2000/svg">
@@ -373,7 +390,7 @@ export default function Home() {
         <input type="number" id="summarizeMax" placeholder="3" onChange={(e) => setSummaryMax(parseInt(e.target.value) || 3)}
           className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
         <p className="w-fit text-sm mt-3">Which model do you want to use for summarization?</p>
-        <select id="modelSelect" onChange={(e) => setModel(e.target.value)} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+        <select id="modelSelect" defaultValue="mixtral-8x7b-instruct" onChange={(e) => setModel(e.target.value)} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
           {/* <option value="llama-2-13b-chat">llama-2-13b-chat</option>
           <option value="llama-2-70b-chat">llama-2-70b-chat</option>
           <option value="codellama-7b-instruct">codellama-7b-instruct</option>
@@ -387,8 +404,8 @@ export default function Home() {
           {/* <option value="gpt-3.5-turbo-0125">GPT-3.5 turbo</option> */}
         </select>
         <div className="themeControls flex gap-2 mt-2">
-          <button onClick={() => setThemeDark(false)} className="bg-gray-300 text-gray-900 dark:bg-gray-700 dark:text-white px-3 py-1 rounded-lg">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="rgb(209 213 219)" height="1.2em" width="1.2em" version="1.1" id="Capa_1" viewBox="0 0 207.628 207.628" >
+          <button onClick={() => setThemeDark(false)} className={`${!themeDark ? 'active bg-gray-700 text-white dark:bg-gray-300 dark:text-gray-900' : 'bg-gray-300 text-gray-900 dark:bg-gray-700 dark:text-white'} px-3 py-1 rounded-lg`}>
+            <svg xmlns="http://www.w3.org/2000/svg" fill={`${themeDark ? "rgb(209 213 219)" : "#1C274C"}`} height="1.2em" width="1.2em" version="1.1" id="Capa_1" viewBox="0 0 207.628 207.628" >
               <circle cx="103.814" cy="103.814" r="45.868" />
               <path d="M103.814,157.183c-29.427,0-53.368-23.941-53.368-53.368s23.941-53.368,53.368-53.368s53.368,23.941,53.368,53.368  S133.241,157.183,103.814,157.183z M103.814,65.446c-21.156,0-38.368,17.212-38.368,38.368s17.212,38.368,38.368,38.368  s38.368-17.212,38.368-38.368S124.97,65.446,103.814,65.446z" />
               <path d="M103.814,39.385c-4.142,0-7.5-3.358-7.5-7.5V7.5c0-4.142,3.358-7.5,7.5-7.5s7.5,3.358,7.5,7.5v24.385  C111.314,36.027,107.956,39.385,103.814,39.385z" />
@@ -401,9 +418,9 @@ export default function Home() {
               <path d="M52.952,60.452c-1.919,0-3.839-0.732-5.303-2.197L30.406,41.013c-2.929-2.929-2.929-7.677,0-10.606  c2.929-2.929,7.678-2.93,10.606,0l17.243,17.242c2.929,2.929,2.929,7.677,0,10.606C56.791,59.72,54.872,60.452,52.952,60.452z" />
             </svg>
           </button>
-          <button onClick={() => setThemeDark(true)} className="bg-gray-700 text-white dark:bg-gray-300 dark:text-gray-900 px-3 py-1 rounded-lg">
-            <svg xmlns="http://www.w3.org/2000/svg" width="1.2em" height="1.2em" viewBox="0 0 24 24" fill="none">
-              <path d="M12 22C17.5228 22 22 17.5228 22 12C22 11.5373 21.3065 11.4608 21.0672 11.8568C19.9289 13.7406 17.8615 15 15.5 15C11.9101 15 9 12.0899 9 8.5C9 6.13845 10.2594 4.07105 12.1432 2.93276C12.5392 2.69347 12.4627 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" fill="#1C274C" />
+          <button onClick={() => setThemeDark(true)} className={`${themeDark ? 'active bg-gray-700 text-white dark:bg-gray-300 dark:text-gray-900' : 'bg-gray-300 text-gray-900 dark:bg-gray-700 dark:text-white'} px-3 py-1 rounded-lg`}>
+            <svg xmlns="http://www.w3.org/2000/svg" width="1.2em" height="1.2em" viewBox="0 0 24 24" fill={`${!themeDark ? "rgb(209 213 219)" : "#1C274C"}`}>
+              <path d="M12 22C17.5228 22 22 17.5228 22 12C22 11.5373 21.3065 11.4608 21.0672 11.8568C19.9289 13.7406 17.8615 15 15.5 15C11.9101 15 9 12.0899 9 8.5C9 6.13845 10.2594 4.07105 12.1432 2.93276C12.5392 2.69347 12.4627 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" />
             </svg>
           </button>
         </div>
@@ -430,8 +447,8 @@ export default function Home() {
               <svg className="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
                 <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2" />
               </svg>
-              <p className="mb-2 text-sm text-gray-500 dark:text-gray-400"><span className="font-semibold">Click to upload</span> or drag and drop</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">PDF, PNG, JPG, JPEG or GIF</p>
+              <p className="mb-2 text-md text-gray-500 dark:text-gray-400"><span className="font-semibold">Click to upload</span> or drag and drop</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">PDF, PNG, JPG, JPEG or GIF</p>
             </div>
             <input id="dropzone-file" type="file"
               name="file"
@@ -440,7 +457,7 @@ export default function Home() {
               className="hidden" />
           </label>
         </div>
-        <button onClick={startSqueeze} className={`${themeDark ? "bg-indigo-500 hover:bg-indigo-700" : "bg-indigo-400 hover:bg-indigo-500"} text-white font-bold py-2 px-4 rounded mt-4`}>Start squeezing</button>
+        <button onClick={startSqueeze} className={`${themeDark ? "bg-indigo-500 hover:bg-indigo-700" : "bg-indigo-400 hover:bg-indigo-500"} text-white text-md font-semibold py-2 px-4 rounded mt-4`}>Start Squeezing</button>
       </div>
 
       <div className={`relative size-40 ${!isScanning && 'hidden'}`}>
@@ -469,11 +486,12 @@ export default function Home() {
             <circle className="spinner_qM83 spinner_ZTLf" cx="20" cy="12" r="3" />
           </svg>
           <div className={`${summary === "" ? 'hidden' : ''}`}>
-            {summary}
+            {summary} <div className={`${!writing ? 'hidden' : ''} cursor`}></div>
           </div>
+          
         </div>
 
       </div>
-    </section>
+    </div>
   );
 }
