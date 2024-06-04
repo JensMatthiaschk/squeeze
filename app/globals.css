@@ -20,11 +20,11 @@ body {
   margin: 0;
   height: 100svh;
   width: 100svw;
-    /* display: grid;
+  /* display: grid;
     place-content: center;
     gap: 20px; */
-    font-family: system-ui, sans-serif;
-    font-size: 20px;
+  font-family: system-ui, sans-serif;
+  font-size: 20px;
   color: rgb(var(--foreground-rgb));
   background: linear-gradient(to bottom,
       transparent,
@@ -52,7 +52,7 @@ body {
     conic-gradient(at var(--r) var(--r), #000 75%, #0000 0) calc(var(--r)/-2) calc(var(--r)/-2) padding-box,
     radial-gradient(50% 50%, #000 98%, #0000 101%) 0 0/var(--r) var(--r) space padding-box;
   /* background: linear-gradient(135deg, #d946ef, #4f46e5) border-box; */
-    
+
   color: #fff;
 }
 
@@ -129,22 +129,27 @@ body {
   /* Safari and Chrome */
 }
 
-.cursor {
-  background-color: rgb(15 23 42);
-  width: 0.20rem;
-  height: 1.5rem;
-  border-radius:1px;
+
+.summary::after {
+  content: "|";
   animation: blink 1s infinite;
 }
 
-@keyframes blink {
 
-  0%,
-  100% {
-    background-color: transparent;
+@keyframes blink {
+  0% {
+    opacity: 1;
   }
 
-  50% {
-    background-color: rgb(255, 255, 255);
+  40% {
+    opacity: 1;
+  }
+
+  60% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 0;
   }
 }

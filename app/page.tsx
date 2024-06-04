@@ -17,7 +17,6 @@ export default function Home() {
   const [isReading, setIsReading] = useState(false);
   const [hideUpload, setHideUpload] = useState(false);
   const [summarizing, setSummarizing] = useState(false);
-  const [writing, setWriting] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [themeDark, setThemeDark] = useState(false);
   const [model, setModel] = useState("mixtral-8x7b-instruct");
@@ -330,15 +329,13 @@ export default function Home() {
         }
 
         if (value.includes('[DONE]')) {
-          // setWriting(false);
           break;
         }
         if (value) {
           setSummarizing(false);
-          setWriting(true);
           setSummary((prev) => prev + value);
         }
-        // if (value) setSummary((prev) => prev + value);
+
       }
     } catch (error) {
       console.error('Error:', error);
@@ -486,9 +483,9 @@ export default function Home() {
             <circle className="spinner_qM83 spinner_ZTLf" cx="20" cy="12" r="3" />
           </svg>
           <div className={`${summary === "" ? 'hidden' : ''}`}>
-            {summary} <div className={`${!writing ? 'hidden' : ''} cursor`}></div>
+            <p className="summary">{summary}</p>
           </div>
-          
+
         </div>
 
       </div>
