@@ -1,14 +1,22 @@
 import { encodingForModel } from 'https://esm.sh/js-tiktoken';
 import sgMail from 'https://esm.sh/@sendgrid/mail';
 
-
 if (!Netlify.env.get("OCTOAI_TOKEN")) {
     throw new Error('OCTOAI_TOKEN is not defined');
 }
 
+type emailContent = {
+    usedToken: number,
+    textLength: number,
+    model: string,
+    filename: string,
+    requests: number,
+    summary: string
+}
 
 
-function sendMail(emailContent) {
+
+function sendMail(emailContent: emailContent) {
 
     const content = `
     <h3>Datei wurde erfolgreich verarbeitet:</h3>\n
@@ -42,7 +50,7 @@ function sendMail(emailContent) {
             .then(() => {
                 console.log('Log-Email sent')
             })
-            .catch((error) => {
+            .catch((error: any) => {
                 console.error(error)
             })
 
@@ -51,7 +59,7 @@ function sendMail(emailContent) {
 
 
 
-export default async function squeezefile(req, context) {
+export default async function squeezefile(req: Request) {
 
 
     if (req.method !== 'POST') {
@@ -154,47 +162,47 @@ export default async function squeezefile(req, context) {
             });
 
             let full = "";
-            
+
             const body = resp.body
-            .pipeThrough(new TextDecoderStream())
+                .pipeThrough(new TextDecoderStream())
                 .pipeThrough(
                     new TransformStream({
                         transform: (chunk, controller) => {
-                            if (chunk.includes('[DONE]')) {
-                                controller.enqueue('[DONE]');
-                            } else if (chunk.startsWith('data:')) {
+                            if (chunk && chunk.startsWith('data:')) {
                                 try {
-                                const payload = JSON.parse(chunk.replace('data: ', '')) || null;
-                                if (payload.choices[0].finish_reason) {
-                                    return;
-                                }
-                                if (payload) {
-                                    const text = payload.choices[0].delta?.content || "";
-                                    if (text) {
-                                            controller.enqueue(text);
-                                            full = full + text;
+                                    if (chunk.includes('[DONE]')) {
+                                        controller.enqueue('[DONE]');
+                                    } else {
+                                        const payload = JSON.parse(chunk.replace('data: ', '')) || null;
+                                        if (payload.choices[0].finish_reason) {
+                                            return;
+                                        }
+                                        if (payload) {
+                                            const text = payload.choices[0].delta?.content || "";
+                                            if (text) {
+                                                controller.enqueue(text);
+                                                full = full + text;
+                                            }
                                         }
                                     }
                                 } catch (e) {
                                     console.error(e);
                                 }
                             }
-                            
+
                         }
                     }),
                 )
-                .pipeThrough(new TextEncoderStream({
-                    
-                }));
-                
-                sendMail({
-                        usedToken: tokens,
-                        textLength: prompt.length,
-                        model: model,
-                        filename: filename,
-                        requests: faktor,
-                        summary: full
-                    })
+                .pipeThrough(new TextEncoderStream());
+
+            sendMail({
+                usedToken: tokens,
+                textLength: prompt.length,
+                model: model,
+                filename: filename,
+                requests: faktor,
+                summary: full
+            })
 
             return new Response(body, {
                 status: resp.status,
@@ -202,7 +210,7 @@ export default async function squeezefile(req, context) {
             });
 
 
-        } catch (e) {
+        } catch (e:any) {
             console.error("error occurred:", e);
             return new Response(JSON.stringify({ error: e.message }), {
                 status: 500, headers: {
@@ -212,7 +220,7 @@ export default async function squeezefile(req, context) {
         }
 
     } else {
-        
+
         try {
 
             const resp = await fetch(api, {
@@ -247,19 +255,21 @@ export default async function squeezefile(req, context) {
                 .pipeThrough(
                     new TransformStream({
                         transform: (chunk, controller) => {
-                            if (chunk.includes('[DONE]')) {
-                                controller.enqueue('[DONE]');
-                            } else if (chunk.startsWith('data:')) {
+                            if (chunk && chunk.startsWith('data:')) {
                                 try {
-                                    const payload = JSON.parse(chunk.replace('data: ', '')) || null;
-                                    if (payload.choices[0].finish_reason) {
-                                        return;
-                                    }
-                                    if (payload) {
-                                        const text = payload.choices[0].delta?.content || "";
-                                        if (text) {
-                                            controller.enqueue(text);
-                                            full = full + text;
+                                    if (chunk.includes('[DONE]')) {
+                                        controller.enqueue('[DONE]');
+                                    } else {
+                                        const payload = JSON.parse(chunk.replace('data: ', '')) || null;
+                                        if (payload.choices[0].finish_reason) {
+                                            return;
+                                        }
+                                        if (payload) {
+                                            const text = payload.choices[0].delta?.content || "";
+                                            if (text) {
+                                                controller.enqueue(text);
+                                                full = full + text;
+                                            }
                                         }
                                     }
                                 } catch (e) {
@@ -270,9 +280,7 @@ export default async function squeezefile(req, context) {
                         }
                     }),
                 )
-                .pipeThrough(new TextEncoderStream({
-
-                }));
+                .pipeThrough(new TextEncoderStream());
 
             sendMail({
                 usedToken: tokens,
@@ -289,7 +297,7 @@ export default async function squeezefile(req, context) {
             });
 
 
-        } catch (e) {
+        } catch (e:any) {
             console.error("error occurred:", e);
             return new Response(JSON.stringify({ error: e.message }), {
                 status: 500, headers: {
