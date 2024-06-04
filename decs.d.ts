@@ -1,3 +1,3 @@
 declare module "https://esm.sh/@sendgrid/mail";
 declare module "https://esm.sh/js-tiktoken";
-declare module "https://esm.sh/@netlify/edge-functions";
+declare module "https://deno.land/std/dotenv/mod.ts";

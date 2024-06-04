@@ -1,7 +1,7 @@
 import { encodingForModel } from 'https://esm.sh/js-tiktoken';
 import sgMail from 'https://esm.sh/@sendgrid/mail';
 
-if (process.env.OCTOAI_TOKEN === undefined) {
+if (!Deno.env.get("OCTOAI_TOKEN")) {
     throw new Error('OCTOAI_TOKEN is not defined');
 }
 
@@ -37,10 +37,10 @@ function sendMail(emailContent: emailContent) {
 
     try {
 
-        sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+        sgMail.setApiKey(Deno.env.get("SENDGRID_API_KEY"));
         const msg = {
-            to: process.env.RECEIVING_EMAIL_ADDRESS,
-            from: process.env.SMTP_USER,
+            to: Deno.env.get('RECEIVING_EMAIL_ADDRESS'),
+            from: Deno.env.get('SMTP_USER'),
             subject: "Squeeze Log - " + new Date().toLocaleDateString('de-DE') + " " + new Date().toLocaleTimeString('de-DE'),
             // text: 'and easy to do anywhere, even with Node.js',
             html: content,
@@ -75,17 +75,17 @@ export default async function squeezefile(req: Request) {
     let bearer;
     let tokenMax;
     if (model.includes("gpt")) {
-        api = process.env.OPENAI_API;
-        bearer = process.env.OPENAI_API_KEY;
+        api = Deno.env.get("OPENAI_API");
+        bearer = Deno.env.get("OPENAI_API_KEY");
         if (model.includes("4")) {
-            tokenMax = parseInt(process.env.OPENAI_MAXTOKENS_GPT4o);
+            tokenMax = parseInt(Deno.env.get("OPENAI_MAXTOKENS_GPT4o"));
         } else {
-            tokenMax = parseInt(process.env.OPENAI_MAXTOKENS_GPT3_5);
+            tokenMax = parseInt(Deno.env.get("OPENAI_MAXTOKENS_GPT3_5"));
         }
     } else {
-        api = process.env.OCTOAI_API;
-        bearer = process.env.OCTOAI_TOKEN;
-        tokenMax = parseInt(process.env.OCTOAI_MAXTOKENS);
+        api = Deno.env.get("OCTOAI_API");
+        bearer = Deno.env.get("OCTOAI_TOKEN")
+        tokenMax = parseInt(Deno.env.get("OCTOAI_MAXTOKENS"));
     }
     const prompt = "Summarize the following text into " + summaryMax + " sentences and simple to understand: " + text;
     const encoding = encodingForModel("gpt-4-turbo-preview");
