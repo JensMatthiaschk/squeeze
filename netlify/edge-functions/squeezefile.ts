@@ -1,7 +1,7 @@
 import { encodingForModel } from 'https://esm.sh/js-tiktoken';
 import sgMail from 'https://esm.sh/@sendgrid/mail';
 
-if (!Netlify.env.get("OCTOAI_TOKEN")) {
+if (process.env.OCTOAI_TOKEN === undefined) {
     throw new Error('OCTOAI_TOKEN is not defined');
 }
 
@@ -37,10 +37,10 @@ function sendMail(emailContent: emailContent) {
 
     try {
 
-        sgMail.setApiKey(Netlify.env.get("SENDGRID_API_KEY"));
+        sgMail.setApiKey(process.env.SENDGRID_API_KEY);
         const msg = {
-            to: Netlify.env.get('RECEIVING_EMAIL_ADDRESS'),
-            from: Netlify.env.get('SMTP_USER'),
+            to: process.env.RECEIVING_EMAIL_ADDRESS,
+            from: process.env.SMTP_USER,
             subject: "Squeeze Log - " + new Date().toLocaleDateString('de-DE') + " " + new Date().toLocaleTimeString('de-DE'),
             // text: 'and easy to do anywhere, even with Node.js',
             html: content,
@@ -75,17 +75,17 @@ export default async function squeezefile(req: Request) {
     let bearer;
     let tokenMax;
     if (model.includes("gpt")) {
-        api = Netlify.env.get("OPENAI_API");
-        bearer = Netlify.env.get("OPENAI_API_KEY");
+        api = process.env.OPENAI_API;
+        bearer = process.env.OPENAI_API_KEY;
         if (model.includes("4")) {
-            tokenMax = parseInt(Netlify.env.get("OPENAI_MAXTOKENS_GPT4o"));
+            tokenMax = parseInt(process.env.OPENAI_MAXTOKENS_GPT4o);
         } else {
-            tokenMax = parseInt(Netlify.env.get("OPENAI_MAXTOKENS_GPT3_5"));
+            tokenMax = parseInt(process.env.OPENAI_MAXTOKENS_GPT3_5);
         }
     } else {
-        api = Netlify.env.get("OCTOAI_API");
-        bearer = Netlify.env.get("OCTOAI_TOKEN")
-        tokenMax = parseInt(Netlify.env.get("OCTOAI_MAXTOKENS"));
+        api = process.env.OCTOAI_API;
+        bearer = process.env.OCTOAI_TOKEN;
+        tokenMax = parseInt(process.env.OCTOAI_MAXTOKENS);
     }
     const prompt = "Summarize the following text into " + summaryMax + " sentences and simple to understand: " + text;
     const encoding = encodingForModel("gpt-4-turbo-preview");
