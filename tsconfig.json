@@ -35,8 +35,7 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "netlify/edge-functions/squeezefile.ts",
-    "netlify/edge-functions/stream.js"
+    "netlify/edge-functions/squeezefile.js",
   ],
   "exclude": [
     "node_modules"

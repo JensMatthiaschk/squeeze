@@ -1,22 +1,14 @@
 import { encodingForModel } from 'https://esm.sh/js-tiktoken';
 import sgMail from 'https://esm.sh/@sendgrid/mail';
 
-if (!Deno.env.get("OCTOAI_TOKEN")) {
+
+if (!Netlify.env.get("OCTOAI_TOKEN")) {
     throw new Error('OCTOAI_TOKEN is not defined');
 }
 
-type emailContent = {
-    usedToken: number,
-    textLength: number,
-    model: string,
-    filename: string,
-    requests: number,
-    summary: string
-}
 
 
-
-function sendMail(emailContent: emailContent) {
+function sendMail(emailContent) {
 
     const content = `
     <h3>Datei wurde erfolgreich verarbeitet:</h3>\n
@@ -37,10 +29,10 @@ function sendMail(emailContent: emailContent) {
 
     try {
 
-        sgMail.setApiKey(Deno.env.get("SENDGRID_API_KEY"));
+        sgMail.setApiKey(Netlify.env.get("SENDGRID_API_KEY"));
         const msg = {
-            to: Deno.env.get('RECEIVING_EMAIL_ADDRESS'),
-            from: Deno.env.get('SMTP_USER'),
+            to: Netlify.env.get('RECEIVING_EMAIL_ADDRESS'),
+            from: Netlify.env.get('SMTP_USER'),
             subject: "Squeeze Log - " + new Date().toLocaleDateString('de-DE') + " " + new Date().toLocaleTimeString('de-DE'),
             // text: 'and easy to do anywhere, even with Node.js',
             html: content,
@@ -50,7 +42,7 @@ function sendMail(emailContent: emailContent) {
             .then(() => {
                 console.log('Log-Email sent')
             })
-            .catch((error: any) => {
+            .catch((error) => {
                 console.error(error)
             })
 
@@ -59,7 +51,7 @@ function sendMail(emailContent: emailContent) {
 
 
 
-export default async function squeezefile(req: Request) {
+export default async function squeezefile(req) {
 
 
     if (req.method !== 'POST') {
@@ -75,17 +67,17 @@ export default async function squeezefile(req: Request) {
     let bearer;
     let tokenMax;
     if (model.includes("gpt")) {
-        api = Deno.env.get("OPENAI_API");
-        bearer = Deno.env.get("OPENAI_API_KEY");
+        api = Netlify.env.get("OPENAI_API");
+        bearer = Netlify.env.get("OPENAI_API_KEY");
         if (model.includes("4")) {
-            tokenMax = parseInt(Deno.env.get("OPENAI_MAXTOKENS_GPT4o"));
+            tokenMax = parseInt(Netlify.env.get("OPENAI_MAXTOKENS_GPT4o"));
         } else {
-            tokenMax = parseInt(Deno.env.get("OPENAI_MAXTOKENS_GPT3_5"));
+            tokenMax = parseInt(Netlify.env.get("OPENAI_MAXTOKENS_GPT3_5"));
         }
     } else {
-        api = Deno.env.get("OCTOAI_API");
-        bearer = Deno.env.get("OCTOAI_TOKEN")
-        tokenMax = parseInt(Deno.env.get("OCTOAI_MAXTOKENS"));
+        api = Netlify.env.get("OCTOAI_API");
+        bearer = Netlify.env.get("OCTOAI_TOKEN")
+        tokenMax = parseInt(Netlify.env.get("OCTOAI_MAXTOKENS"));
     }
     const prompt = "Summarize the following text into " + summaryMax + " sentences and simple to understand: " + text;
     const encoding = encodingForModel("gpt-4-turbo-preview");
@@ -210,7 +202,7 @@ export default async function squeezefile(req: Request) {
             });
 
 
-        } catch (e:any) {
+        } catch (e) {
             console.error("error occurred:", e);
             return new Response(JSON.stringify({ error: e.message }), {
                 status: 500, headers: {
@@ -297,7 +289,7 @@ export default async function squeezefile(req: Request) {
             });
 
 
-        } catch (e:any) {
+        } catch (e) {
             console.error("error occurred:", e);
             return new Response(JSON.stringify({ error: e.message }), {
                 status: 500, headers: {
