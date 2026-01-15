@@ -17,7 +17,7 @@
     "isolatedModules": true,
     "strictNullChecks": false,
     "allowImportingTsExtensions": true,
-    "jsx": "preserve",
+    "jsx": "react-jsx",
     "incremental": true,
     "plugins": [
       {
@@ -36,6 +36,7 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "netlify/edge-functions/squeezefile.js",
+    ".next/dev/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"

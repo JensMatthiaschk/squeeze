@@ -1,6 +1,7 @@
-@tailwind base;
+/* @tailwind base;
 @tailwind components;
-@tailwind utilities;
+@tailwind utilities; */
+@import "tailwindcss";
 
 :root {
   --foreground-rgb: 0, 0, 0;
@@ -26,18 +27,19 @@ body {
   font-family: system-ui, sans-serif;
   font-size: 20px;
   color: rgb(var(--foreground-rgb));
-  background: linear-gradient(to bottom,
+  background: linear-gradient(
+      to bottom,
       transparent,
-      rgb(var(--background-end-rgb))) rgb(var(--background-start-rgb));
+      rgb(var(--background-end-rgb))
+    )
+    rgb(var(--background-start-rgb));
 }
-
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
   }
 }
-
 
 .bubble {
   --r: 25px;
@@ -46,11 +48,13 @@ body {
   /* the size of the tail */
 
   max-width: 80%;
-  padding: calc(2*var(--r)/3);
-  -webkit-mask:
-    radial-gradient(var(--t) at var(--_d) 0, #0000 98%, #000 102%) var(--_d) 100%/calc(100% - var(--r)) var(--t) no-repeat,
-    conic-gradient(at var(--r) var(--r), #000 75%, #0000 0) calc(var(--r)/-2) calc(var(--r)/-2) padding-box,
-    radial-gradient(50% 50%, #000 98%, #0000 101%) 0 0/var(--r) var(--r) space padding-box;
+  padding: calc(2 * var(--r) / 3);
+  -webkit-mask: radial-gradient(var(--t) at var(--_d) 0, #0000 98%, #000 102%)
+      var(--_d) 100% / calc(100% - var(--r)) var(--t) no-repeat,
+    conic-gradient(at var(--r) var(--r), #000 75%, #0000 0) calc(var(--r) / -2)
+      calc(var(--r) / -2) padding-box,
+    radial-gradient(50% 50%, #000 98%, #0000 101%) 0 0 / var(--r) var(--r) space
+      padding-box;
   /* background: linear-gradient(135deg, #d946ef, #4f46e5) border-box; */
 
   color: #fff;
@@ -86,34 +90,32 @@ body {
   background: linear-gradient(135deg, #f0abfc, #f9a8d4) border-box;
 }
 
-
 .spinner_qM83 {
   animation: spinner_8HQG 1.05s infinite;
 }
 
 .spinner_oXPr {
-  animation-delay: .1s;
+  animation-delay: 0.1s;
 }
 
 .spinner_ZTLf {
-  animation-delay: .2s
+  animation-delay: 0.2s;
 }
 
 @keyframes spinner_8HQG {
-
   /* 0%  */
   57.14% {
-    animation-timing-function: cubic-bezier(0.33, .66, .66, 1);
-    transform: translate(0)
+    animation-timing-function: cubic-bezier(0.33, 0.66, 0.66, 1);
+    transform: translate(0);
   }
 
   28.57% {
-    animation-timing-function: cubic-bezier(0.33, 0, .66, .33);
-    transform: translateY(-6px)
+    animation-timing-function: cubic-bezier(0.33, 0, 0.66, 0.33);
+    transform: translateY(-6px);
   }
 
   100% {
-    transform: translate(0)
+    transform: translate(0);
   }
 }
 
@@ -129,12 +131,10 @@ body {
   /* Safari and Chrome */
 }
 
-
 .summary::after {
   content: "|";
   animation: blink 1s infinite;
 }
-
 
 @keyframes blink {
   0% {

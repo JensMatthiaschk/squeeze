@@ -1,6 +1,0 @@
-[[edge_functions]]
-path = "/squeezefile"
-function = "squeezefile"
-
-path = "/hello"
-function = "hello"

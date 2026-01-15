@@ -19,8 +19,16 @@ export default function Home() {
   const [summarizing, setSummarizing] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [themeDark, setThemeDark] = useState(false);
-  const [model, setModel] = useState("mixtral-8x7b-instruct");
-  //'"llama-2-13b-chat" | "llama-2-70b-chat" | "codellama-7b-instruct" | "codellama-13b-instruct" | "codellama-34b-instruct" | "codellama-70b-instruct" | "mistral-7b-instruct" | "mixtral-8x7b-instruct" | "nous-hermes-2-mixtral-8x7b-dpo" | "nous-hermes-2-mistral-7b-dpo"'
+  const [model, setModel] = useState("mistralai/mistral-7b-instruct:free");
+
+  const llms = {
+    // "Mistral: Mistral 7B Instruct": "mistralai/mistral-7b-instruct:free",
+    "Mistral: Mistral Small 3.1 24B": "mistralai/mistral-small-3.1-24b-instruct:free",
+    "Nous: Hermes 3 405B Instruct": "nousresearch/hermes-3-llama-3.1-405b:free",
+    // "OpenAI: gpt-oss-120b":"openai/gpt-oss-120b:free",
+    "Meta: Llama 3.3 70B Instruct": "meta-llama/llama-3.3-70b-instruct:free",
+    "Google: Gemma 3 27B": "google/gemma-3-27b-it:free",
+};
 
 
   function resetAll() {
@@ -388,17 +396,7 @@ export default function Home() {
           className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
         <p className="w-fit text-sm mt-3">Which model do you want to use for summarization?</p>
         <select id="modelSelect" defaultValue="mixtral-8x7b-instruct" onChange={(e) => setModel(e.target.value)} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-          {/* <option value="llama-2-13b-chat">llama-2-13b-chat</option>
-          <option value="llama-2-70b-chat">llama-2-70b-chat</option>
-          <option value="codellama-7b-instruct">codellama-7b-instruct</option>
-          <option value="codellama-13b-instruct">codellama-13b-instruct</option>
-          <option value="codellama-34b-instruct">codellama-34b-instruct</option>
-          <option value="codellama-70b-instruct">codellama-70b-instruct</option> */}
-          <option value="mistral-7b-instruct">mistral-7b-instruct</option>
-          <option value="mixtral-8x7b-instruct">mixtral-8x7b-instruct</option>
-          <option value="nous-hermes-2-mixtral-8x7b-dpo">nous-hermes-2-mixtral-8x7b-dpo</option>
-          <option value="nous-hermes-2-mistral-7b-dpo">nous-hermes-2-mistral-7b-dpo</option>
-          {/* <option value="gpt-3.5-turbo-0125">GPT-3.5 turbo</option> */}
+          {Object.keys(llms).map((model: string) => <option key={model} value={llms[model]}>{model}</option>)}
         </select>
         <div className="themeControls flex gap-2 mt-2">
           <button onClick={() => setThemeDark(false)} className={`${!themeDark ? 'active bg-gray-700 text-white dark:bg-gray-300 dark:text-gray-900' : 'bg-gray-300 text-gray-900 dark:bg-gray-700 dark:text-white'} px-3 py-1 rounded-lg`}>
