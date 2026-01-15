@@ -21,14 +21,14 @@ export default function Home() {
   const [themeDark, setThemeDark] = useState(false);
   const [model, setModel] = useState("mistralai/mistral-7b-instruct:free");
 
-  const llms = {
+  const llms = [
     // "Mistral: Mistral 7B Instruct": "mistralai/mistral-7b-instruct:free",
-    "Mistral: Mistral Small 3.1 24B": "mistralai/mistral-small-3.1-24b-instruct:free",
-    "Nous: Hermes 3 405B Instruct": "nousresearch/hermes-3-llama-3.1-405b:free",
+    {name:"Mistral: Mistral Small 3.1 24B",value: "mistralai/mistral-small-3.1-24b-instruct:free"},
+{    name: "Nous: Hermes 3 405B Instruct",value: "nousresearch/hermes-3-llama-3.1-405b:free"},
     // "OpenAI: gpt-oss-120b":"openai/gpt-oss-120b:free",
-    "Meta: Llama 3.3 70B Instruct": "meta-llama/llama-3.3-70b-instruct:free",
-    "Google: Gemma 3 27B": "google/gemma-3-27b-it:free",
-};
+    {name: "Meta: Llama 3.3 70B Instruct",value: "meta-llama/llama-3.3-70b-instruct:free"},
+    {name: "Google: Gemma 3 27B",value: "google/gemma-3-27b-it:free"}
+  ];
 
 
   function resetAll() {
@@ -90,7 +90,7 @@ export default function Home() {
             const context = canvas.getContext("2d");
             canvas.height = viewport.height;
             canvas.width = viewport.width;
-            page.render({ canvasContext: context, viewport: viewport }).promise.then(() => {
+            page.render({ canvasContext: context, viewport: viewport, canvas: canvas }).promise.then(() => {
               const image = new Image();
               image.height = 100;
               image.title = file.name;
@@ -270,7 +270,7 @@ export default function Home() {
           const context = canvas.getContext("2d");
           canvas.height = viewport.height;
           canvas.width = viewport.width;
-          await page.render({ canvasContext: context, viewport: viewport }).promise;
+          await page.render({ canvasContext: context, viewport: viewport, canvas: canvas }).promise;
           const scanText = await Tesseract.recognize(
             canvas,
             language,
@@ -396,7 +396,7 @@ export default function Home() {
           className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
         <p className="w-fit text-sm mt-3">Which model do you want to use for summarization?</p>
         <select id="modelSelect" defaultValue="mixtral-8x7b-instruct" onChange={(e) => setModel(e.target.value)} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-          {Object.keys(llms).map((model: string) => <option key={model} value={llms[model]}>{model}</option>)}
+          {Object.keys(llms).map((model: string) => <option key={model} value={llms.filter((l: any) => l.name == model)[0]?.value}>{model}</option>)}
         </select>
         <div className="themeControls flex gap-2 mt-2">
           <button onClick={() => setThemeDark(false)} className={`${!themeDark ? 'active bg-gray-700 text-white dark:bg-gray-300 dark:text-gray-900' : 'bg-gray-300 text-gray-900 dark:bg-gray-700 dark:text-white'} px-3 py-1 rounded-lg`}>
