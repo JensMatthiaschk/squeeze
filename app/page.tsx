@@ -396,7 +396,7 @@ export default function Home() {
           className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
         <p className="w-fit text-sm mt-3">Which model do you want to use for summarization?</p>
         <select id="modelSelect" defaultValue="mixtral-8x7b-instruct" onChange={(e) => setModel(e.target.value)} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-          {Object.keys(llms).map((model: string) => <option key={model} value={llms.filter((l: any) => l.name == model)[0]?.value}>{model}</option>)}
+          {llms.map((model: any, index) => <option key={index} value={model.value}>{model.name}</option>)}
         </select>
         <div className="themeControls flex gap-2 mt-2">
           <button onClick={() => setThemeDark(false)} className={`${!themeDark ? 'active bg-gray-700 text-white dark:bg-gray-300 dark:text-gray-900' : 'bg-gray-300 text-gray-900 dark:bg-gray-700 dark:text-white'} px-3 py-1 rounded-lg`}>
