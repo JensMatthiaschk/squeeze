@@ -187,8 +187,7 @@ export async function POST(req: NextRequest) {
       maxtokens: 131100,
     },
   ];
-  // let api = "https://openrouter.ai/api/v1/chat/completions"; //remote
-  let api = "http://127.0.0.1:12434/engines/llama.cpp/v1/chat/completions"; //local
+  let api = process.env.API_URL;
   let bearer = process.env.OPENROUTER_API_KEY;
   // let tokenMax = 32800; //remote
   let tokenMax = 4096; //local (context length in bits)
@@ -220,7 +219,7 @@ export async function POST(req: NextRequest) {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              // Authorization: "Bearer " + bearer,
+              Authorization: "Bearer " + bearer,
             },
             signal: AbortSignal.timeout(abortTimeout),
             body: JSON.stringify({
@@ -275,7 +274,7 @@ export async function POST(req: NextRequest) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          // Authorization: "Bearer " + bearer,
+          Authorization: "Bearer " + bearer,
         },
         signal: AbortSignal.timeout(abortTimeout),
         body: JSON.stringify({
@@ -396,7 +395,7 @@ export async function POST(req: NextRequest) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          // Authorization: "Bearer " + bearer,
+          Authorization: "Bearer " + bearer,
         },
         signal: AbortSignal.timeout(abortTimeout),
         body: JSON.stringify({
