@@ -24,9 +24,9 @@ export default function Home() {
   const llms = [
     //remote
     {name: "Google: Gemma 3 27B", value: "google/gemma-3-27b-it:free"},
-    {name: "Mistral: Mistral 7B Instruct", value: "mistralai/mistral-7b-instruct:free"},
     {name: "Meta: Llama 3.3 70B Instruct", value: "meta-llama/llama-3.3-70b-instruct:free"},
     {name: "Qwen: Qwen 3 Next 80B A3B Instruct", value: "qwen/qwen3-next-80b-a3b-instruct:free"},
+    {name: "Mistral: Mistral Small 3.1 24B", value: "mistralai/mistral-small-3.1-24b-instruct:free"},
     {name: "Nous: Hermes 3 405B Instruct", value: "nousresearch/hermes-3-llama-3.1-405b:free"},
 
     //local

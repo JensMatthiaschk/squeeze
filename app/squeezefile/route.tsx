@@ -163,10 +163,10 @@ export async function POST(req: NextRequest) {
       maxtokens: 128000,
     },
     {
-      name: "Mistral: Mistral 7B Instruct",
-      val: "mistralai/mistral-7b-instruct:free",
-      maxcontext: 32800,
-      maxtokens: 16400,
+      name: "Mistral: Mistral Small 3.1 24B",
+      val: "mistralai/mistral-small-3.1-24b-instruct:free",
+      maxcontext: 128000,
+      maxtokens: 128000,
     },
     {
       name: "Meta: Llama 3.3 70B Instruct",
