@@ -23,16 +23,17 @@ export default function Home() {
 
   const llms = [
     //remote
-    // {name:"Mistral: Mistral Small 3.1 24B",value: "mistralai/mistral-small-3.1-24b-instruct:free"},
-    // {name: "Nous: Hermes 3 405B Instruct",value: "nousresearch/hermes-3-llama-3.1-405b:free"},
-    // {name: "Meta: Llama 3.3 70B Instruct",value: "meta-llama/llama-3.3-70b-instruct:free"},
-    // {name: "Google: Gemma 3 27B",value: "google/gemma-3-27b-it:free"},
+    {name: "Google: Gemma 3 27B", value: "google/gemma-3-27b-it:free"},
+    {name: "Mistral: Mistral 7B Instruct", value: "mistralai/mistral-7b-instruct:free"},
+    {name: "Meta: Llama 3.3 70B Instruct", value: "meta-llama/llama-3.3-70b-instruct:free"},
+    {name: "Qwen: Qwen 3 Next 80B A3B Instruct", value: "qwen/qwen3-next-80b-a3b-instruct:free"},
+    {name: "Nous: Hermes 3 405B Instruct", value: "nousresearch/hermes-3-llama-3.1-405b:free"},
 
     //local
-    { name: "Google: Gemma 3 4B", value: "gemma3:4B-Q4_K_M"},
-    { name: "Qwen 2.5 3B", value: "qwen2.5:3B-Q4_K_M" },
-    { name: "Mistral 7B Instruct", value: "mistral:7B-Q4_K_M" },
-    { name: "Llama 3.2 3B", value: "llama3.2:3B-Q4_K_M" },
+    // { name: "Google: Gemma 3 4B", value: "gemma3:4B-Q4_K_M"},
+    // { name: "Qwen 2.5 3B", value: "qwen2.5:3B-Q4_K_M" },
+    // { name: "Mistral 7B Instruct", value: "mistral:7B-Q4_K_M" },
+    // { name: "Llama 3.2 3B", value: "llama3.2:3B-Q4_K_M" },
   ];
 
 

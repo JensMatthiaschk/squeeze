@@ -151,29 +151,23 @@ export async function POST(req: NextRequest) {
   const { text, summaryMax, model, filename } = await req.json();
   const llms = [
     // {
-    //   name: "Mistral: Mistral 7B Instruct",
-    //   val: "mistralai/mistral-7b-instruct:free",
-    //   maxcontext: 32800,
-    //   maxtokens: 16400,
-    // },
-    {
-      name: "Mistral: Mistral Small 3.1 24B",
-      val: "mistralai/mistral-small-3.1-24b-instruct:free",
-      maxcontext: 128000,
-      maxtokens: 128000,
-    },
-    {
-      name: "Nous: Hermes 3 405B Instruct",
-      val: "nousresearch/hermes-3-llama-3.1-405b:free",
-      maxcontext: 131100,
-      maxtokens: 131100,
-    },
-    // {
     //   name: "OpenAI: gpt-oss-120b",
     //   val: "openai/gpt-oss-120b:free",
     //   maxcontext: 131100,
     //   maxtokens: 131100,
     // },
+    {
+      name: "Google: Gemma 3 27B",
+      val: "google/gemma-3-27b-it:free",
+      maxcontext: 128000,
+      maxtokens: 128000,
+    },
+    {
+      name: "Mistral: Mistral 7B Instruct",
+      val: "mistralai/mistral-7b-instruct:free",
+      maxcontext: 32800,
+      maxtokens: 16400,
+    },
     {
       name: "Meta: Llama 3.3 70B Instruct",
       val: "meta-llama/llama-3.3-70b-instruct:free",
@@ -181,16 +175,33 @@ export async function POST(req: NextRequest) {
       maxtokens: 65500,
     },
     {
-      name: "Google: Gemma 3 27B",
-      val: "google/gemma-3-27b-it:free",
+      name: "Qwen: Qwen 3 Next 80B A3B Instruct",
+      val: "qwen/qwen3-next-80b-a3b-instruct:free",
+      maxcontext: 262100,
+      maxtokens: 262100,
+    },
+    {
+      name: "Nous: Hermes 3 405B Instruct",
+      val: "nousresearch/hermes-3-llama-3.1-405b:free",
       maxcontext: 131100,
       maxtokens: 131100,
     },
   ];
+
+  if (!llms.find((l) => l.val === model)) {
+    return new Response(
+      JSON.stringify({
+        error: "Model not found",
+      }),
+      {
+        status: 400,
+      }
+    );
+  }
   let api = process.env.API_URL;
   let bearer = process.env.OPENROUTER_API_KEY;
-  // let tokenMax = 32800; //remote
-  let tokenMax = 4096; //local (context length in bits)
+  let tokenMax = llms.find((l) => l.val === model)?.maxcontext || 32768;
+  // let tokenMax = 4096; //local (context length in bits)
 
   const prompt =
     "Summarize the following text into " +
